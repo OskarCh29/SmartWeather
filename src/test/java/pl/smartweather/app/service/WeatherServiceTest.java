@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Testcontainers
 public class WeatherServiceTest {
     @Container
-    static final MongoDBContainer MONGO_DB_CONTAINER = new MongoDBContainer("mongo:7.0")
+    static final MongoDBContainer MONGO_DB_CONTAINER = new MongoDBContainer("mongo:4.4.18")
             .withExposedPorts(27017);
     private static final WireMockServer WIRE_MOCK_SERVER = new WireMockServer(wireMockConfig().dynamicPort());
 

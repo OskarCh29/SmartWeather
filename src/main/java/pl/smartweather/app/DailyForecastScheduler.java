@@ -9,8 +9,10 @@ import org.springframework.stereotype.Component;
 import pl.smartweather.app.model.entity.Weather;
 import pl.smartweather.app.service.EmailService;
 import pl.smartweather.app.service.WeatherService;
+
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Slf4j
@@ -29,8 +31,9 @@ public class DailyForecastScheduler {
     @Value("${userData.secondUserEmail}")
     private String secondUserEmail;
 
-    @Scheduled(cron = "0 0 8 * * ?")
+    @Scheduled(cron = "* * * * * ?")
     public void sendInfoMail() {
+        log.info("Schedule class started: ", LocalDateTime.now());
         try {
             String today = DateTimeFormatter.ISO_DATE.format(LocalDate.now());
             weatherService.saveWeatherRecord(location);
