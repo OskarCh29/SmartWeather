@@ -12,7 +12,6 @@ import pl.smartweather.app.service.WeatherService;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Slf4j
@@ -31,9 +30,8 @@ public class DailyForecastScheduler {
     @Value("${userData.secondUserEmail}")
     private String secondUserEmail;
 
-    @Scheduled(cron = "* * * * * ?")
+    @Scheduled(cron = "0 8 * * * ?")
     public void sendInfoMail() {
-        log.info("Schedule class started: ", LocalDateTime.now());
         try {
             String today = DateTimeFormatter.ISO_DATE.format(LocalDate.now());
             weatherService.saveWeatherRecord(location);
