@@ -33,9 +33,9 @@ https://github.com/OskarCh29/SmartWeather.git
     To run this project, you will need to add the following environment variables to your .env file / IDE running configuration or by just writing in `application.yaml` file 
     <br>
 
-    `MAIL_HOST` - <b>default<b> set to smtp.gmail.com 
+    `MAIL_HOST` - Default set to smtp.gmail.com 
 
-    `MAIL_PORT` - <b>default<b> set to 587
+    `MAIL_PORT` - Default set to 587
 
     `MAIL_USERNAME` - Username to the `sender` e-mail (used for sending e-mails)
 
@@ -97,23 +97,26 @@ If all is setted up properly app will run automaticlly and will be sending repor
 - How to set up / edit the schedule
     <br>
     Base schedule is set to generate reports everyday at 08:00 in the morning. If like to   change basic settings navigate to the main app folder and locate java class `DailyForecastScheduler.java`. 
-    After finding annotation @Scheduled just edit the cron in the brackets. Provide proper  cron expression
-
+    After finding annotation @Scheduled just edit the cron in the brackets. Provide proper  cron expression<br>
+    
+Example of the report:<br>
+<img src="images/report-example.jpg" width="400" alt="Report example">
+<img src="images/chart-example.jpg" width="400" alt="Chart example">
 ## Technologies
 
-**Java:** The primary programming langauge for building backend logic
+<b>Java:</b> The primary programming language for building backend logic
 
-**Spring Boot:** A framework used to develop the RESTful application that handles intereacting with the weather data API etc
+<b>Spring Boot:</b> A framework used to develop the RESTful application that handles intereacting with the weather data API etc
 
-**Maven:** Used for dependency management and project build automation
+<b>Maven:</b> Used for dependency management and project build automation
 
-**Docker:** Used for testing, making it easier to isolate the application and making integrating testing
+<b>Docker:</b> Used for testing, making it easier to isolate the application and making integrating testing
 
-**Docker Compose:** Utilized to set up and manage the MongoDB database on Raspberry Pi, allowing database integration
+<b>Docker Compose:</b> Utilized to set up and manage the MongoDB database on Raspberry Pi, allowing database integration
 
-**MongoDB:** A NoSQL databased used to store weather report. Will be also used for statistics in the future
+<b>MongoDB:</b> A NoSQL databased used to store weather report. Will be also used for statistics in the future
 
-**Raspberry Pi:** The hardware platform on which the application runs
+<b>Raspberry Pi:</b> The hardware platform on which the application runs
 
 ## Testing
 
@@ -122,7 +125,7 @@ To run tests, run the following command. Be aware that all integration tests wou
 ```bash
   mvn clean test
 ```
-Project has checkstyle-validation so if there would any checkstyle-errors app will not run. All errors would be provided in the checkstyle-result file.<br>
+The project uses checkstyle validation, so if there are any checkstyle errors app will not run. All errors would be provided in the checkstyle-result file.<br>
 Project also provided Jacoco test coverage reports. If you are interested run:
 ```bash
 mvn jacoco:report
