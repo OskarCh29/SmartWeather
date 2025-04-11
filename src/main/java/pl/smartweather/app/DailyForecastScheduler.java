@@ -30,7 +30,7 @@ public class DailyForecastScheduler {
     @Value("${userData.secondUserEmail}")
     private String secondUserEmail;
 
-    @Scheduled(cron = "0 8 * * * ?")
+    @Scheduled(cron = "0 0 8 * * *")
     public void sendInfoMail() {
         try {
             String today = DateTimeFormatter.ISO_DATE.format(LocalDate.now());
