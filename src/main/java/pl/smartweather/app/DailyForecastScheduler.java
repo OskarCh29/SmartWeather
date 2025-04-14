@@ -1,6 +1,5 @@
 package pl.smartweather.app;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +31,6 @@ public class DailyForecastScheduler {
     private String secondUserEmail;
 
     @Scheduled(cron = "0 0 8 * * *")
-    @PostConstruct
     public void sendInfoMail() {
         try {
             String today = DateTimeFormatter.ISO_DATE.format(LocalDate.now());
