@@ -7,7 +7,7 @@
     <title>Weather Forecast</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+        integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
 
     <style>
         body {
@@ -122,68 +122,127 @@
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
             color: #004d40;
         }
+
+        .forecast-table table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.95rem;
+        }
+
+        .forecast-table th,
+        .forecast-table td {
+            padding: 12px 15px;
+            border: 1px solid #dee2e6;
+            text-align: center;
+        }
+
+        .forecast-table thead {
+            background-color: #1565c0;
+            color: #ffffff;
+        }
+
+        .forecast-table tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .forecast-table tbody tr:hover {
+            background-color: #e0f7fa;
+        }
+
+        .forecast-table table {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 
 <body>
-<div class="text-center mb-4">
-    <h1 class="main-heading">
-        Weather For: <span th:text="${weather.location}"></span>
-    </h1>
-</div>
-
-<div class="row header-sub align-items-center mb-4 text-center">
-    <div class="col-md-4">
-        <strong>Date:</strong> <span th:text="${weather.date}"></span>
-
+    <div class="text-center mb-4">
+        <h1 class="main-heading">
+            Weather For: <span th:text="${weather.location}"></span>
+        </h1>
     </div>
-    <div class="col-md-4">
-        <strong>Sunrise:</strong> <span th:text="${weather.forecastInformation[0].sunrise}"></span>
-    </div>
-    <div class="col-md-4">
-        <strong>Sunset:</strong> <span th:text="${weather.forecastInformation[0].sunset}"></span>
-    </div>
-</div>
 
+    <div class="row header-sub align-items-center mb-4 text-center">
+        <div class="col-md-4">
+            <strong>Date:</strong> <span th:text="${weather.date}"></span>
 
-<div class="row">
-    <div class="container-fluid mb-4">
-        <div class="current-weather text-center">
-            <h3 class="mb-4">Current Weather</h3>
-            <div class="row text-start">
-                <div class="col-md-4 mb-3">
-                    <p><strong>Temperature [°C]:</strong> <span
-                            th:text="${weather.weatherInformation.temperature}"></span></p>
-                    <p><strong>Feels like [°C]:</strong> <span
-                            th:text="${weather.weatherInformation.feelsLike}"></span></p>
-                    <p><strong>Today max temperature [°C]: <span
-                            th:text="${weather.forecastInformation[0].maxTemperature}"></span></strong></p>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <p><strong>Wind [km/h]:</strong> <span th:text="${weather.weatherInformation.windSpeed}"></span>
-                    </p>
-                    <p><strong>Cloud [%]:</strong> <span th:text="${weather.weatherInformation.cloud}"></span></p>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <p><strong>Pressure [hPa]:</strong> <span
-                            th:text="${weather.weatherInformation.pressure}"></span></p>
-                    <p><strong>Humidity [%]:</strong> <span th:text="${weather.weatherInformation.humidity}"></span>
-                    </p>
-                </div>
-            </div>
+        </div>
+        <div class="col-md-4">
+            <strong>Sunrise:</strong> <span th:text="${weather.forecastInformation[0].sunrise}"></span>
+        </div>
+        <div class="col-md-4">
+            <strong>Sunset:</strong> <span th:text="${weather.forecastInformation[0].sunset}"></span>
         </div>
     </div>
 
-</div>
-<div class="col-md-8">
-    <div class="forecast-section">
-        <h2>Forecast:</h2>
-        <img src="cid:chart_temperature" alt="Temperature Chart"/>
-        <img src="cid:chart_rain" alt="Rain Chart"/>
+
+    <div class="row">
+        <div class="container-fluid mb-4">
+            <div class="current-weather text-center">
+                <h3 class="mb-4">Current Weather</h3>
+                <div class="row text-start">
+                    <div class="col-md-4 mb-3">
+                        <p><strong>Temperature [°C]:</strong> <span
+                                th:text="${weather.weatherInformation.temperature}"></span></p>
+                        <p><strong>Feels like [°C]:</strong> <span
+                                th:text="${weather.weatherInformation.feelsLike}"></span></p>
+                        <p><strong>Today max temperature [°C]: <span
+                                    th:text="${weather.forecastInformation[0].maxTemperature}"></span></strong></p>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <p><strong>Wind [km/h]:</strong> <span th:text="${weather.weatherInformation.windSpeed}"></span>
+                        </p>
+                        <p><strong>Cloud [%]:</strong> <span th:text="${weather.weatherInformation.cloud}"></span></p>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <p><strong>Pressure [hPa]:</strong> <span
+                                th:text="${weather.weatherInformation.pressure}"></span></p>
+                        <p><strong>Humidity [%]:</strong> <span th:text="${weather.weatherInformation.humidity}"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
-</div>
-</div>
-</div>
+    <div class="col-md-8">
+        <div class="forecast-section">
+            <h2>Forecast:</h2>
+            <img src="cid:chart_temperature" alt="Temperature Chart" />
+            <img src="cid:chart_rain" alt="Rain Chart" />
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="forecast-table">
+            <h2>Forecast Table:</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Hour</th>
+                        <th>Temperature [°C]</th>
+                        <th>Feels like [°C]</th>
+                        <th>Wind [km/h]</th>
+                        <th>Cloud [%]</th>
+                        <th>Rain [%]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="hour : ${weather.forecastInformation[0].hourlyForecast}">
+                        <td th:text="${hour.hour}"></td>
+                        <td th:text="${hour.temperature}"></td>
+                        <td th:text="${hour.feelsLike}"></td>
+                        <td th:text="${hour.windSpeed}"></td>
+                        <td th:text="${hour.cloud}"></td>
+                        <td th:text="${hour.chanceOfRain}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 
 </body>
 
