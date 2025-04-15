@@ -1,18 +1,4 @@
 services:
-  smart-weather:
-    environment:
-      - MAIL_HOST=smtp.gmail.com
-      - MAIL_PORT=587
-      - MAIL_USERNAME= YourMailSenderUsername
-      - MAIL_PASSWORD=your_password
-      - WEATHER_KEY=you_API_KEY
-      - ADMIN_EMAIL=MainEmailYouReceiveEmail
-      - SUBSCRIBE_EMAIL=AdditionalEmailForFriend
-    container_name: smart-weather
-    privileged: true
-    image: pl.smart-weather/smart-weather:latest
-    ports:
-      - "8081:8081"
   mongo:
     image: mongo:4.4.18
     container_name: mongodb
