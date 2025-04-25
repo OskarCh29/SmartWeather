@@ -21,6 +21,9 @@ userData:
   location: Bialystok
   userEmail: ${ADMIN_EMAIL}
   secondUserEmail: ${SUBSCRIBE_EMAIL}
+server:
+  port: 8080
+  address: 0.0.0.0
 
 
 

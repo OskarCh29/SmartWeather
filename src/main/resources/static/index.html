@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Smart-Weather</title>
+</head>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+<script src="scripts/jquery-3.7.1.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
+    crossorigin="anonymous"></script>
+<style>
+    .text-teal {
+        color: #20c997;
+    }
+
+    .move-up {
+        margin-bottom: 15px;
+    }
+</style>
+
+<body>
+    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home"
+                type="button" role="tab" aria-controls="pills-home" aria-selected="true" id="homeButton">Home</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile"
+                type="button" role="tab" aria-controls="pills-profile" aria-selected="false"
+                id="forecastButton">Forecast</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#pills-contact"
+                type="button" role="tab" aria-controls="pills-contact" aria-selected="false"
+                id="configButton">Config</button>
+        </li>
+    </ul>
+    <div class="tab-content" id="pills-tabContent">
+        <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab"></div>
+        <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab"></div>
+        <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab"></div>
+    </div>
+    <div class="text-center mb-4">
+        <h1 class="main-heading text-info">
+            Smart-Weather Service
+        </h1>
+        <hr>
+    </div>
+
+    <div class="row">
+        <div class="text-center col-md-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="yellow"
+                class="bi bi-sunrise-fill move-up" viewBox="0 0 16 16">
+                <path
+                    d="M7.646 1.146a.5.5 0 0 1 .708 0l1.5 1.5a.5.5 0 0 1-.708.708L8.5 2.707V4.5a.5.5 0 0 1-1 0V2.707l-.646.647a.5.5 0 1 1-.708-.708zM2.343 4.343a.5.5 0 0 1 .707 0l1.414 1.414a.5.5 0 0 1-.707.707L2.343 5.05a.5.5 0 0 1 0-.707m11.314 0a.5.5 0 0 1 0 .707l-1.414 1.414a.5.5 0 1 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0M11.709 11.5a4 4 0 1 0-7.418 0H.5a.5.5 0 0 0 0 1h15a.5.5 0 0 0 0-1h-3.79zM0 10a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2A.5.5 0 0 1 0 10m13 0a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5" />
+            </svg>
+            <span class="display-6 text-success" id="sunrise">00:00</span>
+        </div>
+        <div class="text-center col-md-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="rgba(54, 162, 235, 1)"
+                class="bi bi-clock-fill move-up" viewBox="0 0 16 16">
+                <path
+                    d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71z" />
+            </svg>
+            <span class="display-6 text-success" id="time">00:00</span>
+        </div>
+        <div class="text-center col-md-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="orange"
+                class="bi bi-sunset-fill move-up" viewBox="0 0 16 16">
+                <path
+                    d="M7.646 4.854a.5.5 0 0 0 .708 0l1.5-1.5a.5.5 0 0 0-.708-.708l-.646.647V1.5a.5.5 0 0 0-1 0v1.793l-.646-.647a.5.5 0 1 0-.708.708zm-5.303-.51a.5.5 0 0 1 .707 0l1.414 1.413a.5.5 0 0 1-.707.707L2.343 5.05a.5.5 0 0 1 0-.707zm11.314 0a.5.5 0 0 1 0 .706l-1.414 1.414a.5.5 0 1 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zM11.709 11.5a4 4 0 1 0-7.418 0H.5a.5.5 0 0 0 0 1h15a.5.5 0 0 0 0-1h-3.79zM0 10a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2A.5.5 0 0 1 0 10m13 0a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5" />
+            </svg>
+            <span class="display-6 text-success" id="sunset">00:00</span>
+        </div>
+    </div>
+    <hr>
+
+
+    <div class="row">
+        <div class="text-center mb-4">
+            <span class="display-5 text-info" id="location">Location - Date</span>
+        </div>
+    </div>
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-md-3 text-left border-end">
+                <h5 class="text-teal">Current Weather</h5>
+                <p><strong>Temperature:</strong> <span id="temp-value">-- °C</span></p>
+                <p><strong>Feels Like:</strong> <span id="feelsLike-value">-- °C</span></p>
+                <p><strong>Today max temperature:</strong> <span id="maxTemp-value">-- °C</span></p>
+                <p><strong>Wind:</strong> <span id="wind-value">-- km/h</span></p>
+                <p><strong>Cloud:</strong> <span id="cloud-value">-- %</span></p>
+                <p><strong>Pressure:</strong> <span id="pressure-value">-- hPa</span></p>
+                <p><strong>Humidity:</strong> <span id="humidity-value">-- %</span></p>
+            </div>
+            <div class="col-md-5 text-center">
+                <h5 class="text-teal">Temperature Chart</h5>
+                <canvas id="temperatureChart" width="400" height="200"></canvas>
+
+            </div>
+
+            <div class="col-md-4 text-center">
+                <h5 class="text-teal">Rain / Cloud Chart</h5>
+                <canvas id="rainCloudChart" width="400" height="200"></canvas>
+
+            </div>
+        </div>
+        <hr>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="scripts/welcomePageScript.js"></script>
+
+</body>
+
+</html>
