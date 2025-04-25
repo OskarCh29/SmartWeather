@@ -10,7 +10,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import pl.smartweather.app.model.entity.Weather;
+import pl.smartweather.app.entity.Weather;
 
 import java.io.IOException;
 import java.util.HashMap;

@@ -11,9 +11,9 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import pl.smartweather.app.model.entity.ForecastInformation;
-import pl.smartweather.app.model.entity.Weather;
-import pl.smartweather.app.model.entity.WeatherInformation;
+import pl.smartweather.app.entity.ForecastInformation;
+import pl.smartweather.app.entity.Weather;
+import pl.smartweather.app.entity.WeatherInformation;
 
 import java.util.List;
 

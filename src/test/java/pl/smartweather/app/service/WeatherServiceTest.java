@@ -15,9 +15,9 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import pl.smartweather.app.exception.BadParametersRequestException;
 import pl.smartweather.app.exception.NoMatchFoundException;
-import pl.smartweather.app.model.entity.ForecastInformation;
-import pl.smartweather.app.model.entity.Weather;
-import pl.smartweather.app.model.entity.WeatherInformation;
+import pl.smartweather.app.entity.ForecastInformation;
+import pl.smartweather.app.entity.Weather;
+import pl.smartweather.app.entity.WeatherInformation;
 import pl.smartweather.app.repository.WeatherRepository;
 import pl.smartweather.app.utils.TestUtils;
 

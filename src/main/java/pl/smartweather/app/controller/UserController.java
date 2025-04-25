@@ -1,11 +1,12 @@
 package pl.smartweather.app.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.smartweather.app.model.entity.User;
-import pl.smartweather.app.model.response.GenericServerResponse;
+import pl.smartweather.app.entity.User;
+import pl.smartweather.app.model.GenericServerResponse;
 import pl.smartweather.app.service.UserService;
 
 import java.util.List;
@@ -26,12 +27,12 @@ public class UserController {
     }
 
     @PostMapping("/user")
-    public ResponseEntity<User> saveNewUser(@RequestBody(required = true) User user) {
+    public ResponseEntity<User> saveNewUser(@RequestBody(required = true) @Valid User user) {
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
     @DeleteMapping("/user")
-    public ResponseEntity<GenericServerResponse> deleteUser(@RequestBody(required = true) User user) {
+    public ResponseEntity<GenericServerResponse> deleteUser(@RequestBody(required = true) @Valid User user) {
         userService.deleteUser(user);
         return ResponseEntity.ok(new GenericServerResponse("User: " + user.getEmailAddress() + " has been deleted"));
     }

@@ -1,5 +1,6 @@
-package pl.smartweather.app.model.entity;
+package pl.smartweather.app.entity;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,5 +17,6 @@ public class User {
     private String id;
 
     @Indexed(unique = true)
+    @NotBlank
     private String emailAddress;
 }

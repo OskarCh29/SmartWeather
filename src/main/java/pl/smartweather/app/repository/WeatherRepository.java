@@ -2,7 +2,7 @@ package pl.smartweather.app.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
-import pl.smartweather.app.model.entity.Weather;
+import pl.smartweather.app.entity.Weather;
 
 import java.util.Optional;
 

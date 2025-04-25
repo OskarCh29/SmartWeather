@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import pl.smartweather.app.model.entity.Weather;
+import pl.smartweather.app.entity.Weather;
 import pl.smartweather.app.service.EmailService;
 import pl.smartweather.app.service.WeatherService;
 

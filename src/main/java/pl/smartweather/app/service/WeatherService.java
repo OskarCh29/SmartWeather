@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import pl.smartweather.app.exception.BadParametersRequestException;
 import pl.smartweather.app.exception.NoMatchFoundException;
-import pl.smartweather.app.model.entity.ForecastInformation;
-import pl.smartweather.app.model.entity.Weather;
-import pl.smartweather.app.model.entity.WeatherInformation;
-import pl.smartweather.app.model.response.ForecastResponse;
-import pl.smartweather.app.model.response.WeatherResponse;
+import pl.smartweather.app.entity.ForecastInformation;
+import pl.smartweather.app.entity.Weather;
+import pl.smartweather.app.entity.WeatherInformation;
+import pl.smartweather.app.model.ForecastResponse;
+import pl.smartweather.app.model.WeatherResponse;
 import pl.smartweather.app.repository.WeatherRepository;
 import reactor.core.publisher.Mono;
 

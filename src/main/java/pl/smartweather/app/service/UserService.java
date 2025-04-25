@@ -3,7 +3,7 @@ package pl.smartweather.app.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.smartweather.app.exception.UserNotFoundException;
-import pl.smartweather.app.model.entity.User;
+import pl.smartweather.app.entity.User;
 import pl.smartweather.app.repository.UserRepository;
 
 import java.util.List;

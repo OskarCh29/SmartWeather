@@ -1,4 +1,4 @@
-package pl.smartweather.app.model.response;
+package pl.smartweather.app.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

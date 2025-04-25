@@ -9,7 +9,7 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.springframework.stereotype.Service;
-import pl.smartweather.app.model.entity.WeatherInformation;
+import pl.smartweather.app.entity.WeatherInformation;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

@@ -1,4 +1,4 @@
-package pl.smartweather.app.model.entity;
+package pl.smartweather.app.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
