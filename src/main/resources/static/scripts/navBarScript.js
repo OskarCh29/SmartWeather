@@ -13,18 +13,16 @@ $(document).ready(function () {
         window.location.href = "/config.html";
     });
 
-    var activeTab = localStorage.getItem("activeTab");
-    if (activeTab == "home") {
+    const path = window.location.pathname;
+    $("#homeButton, #forecastButton, #configButton").removeClass("active");
+
+    if (path.includes("index.html") || path === "/") {
         $("#homeButton").addClass("active");
-        $("#forecastButton").removeClass("active");
-        $("#configButton").removeClass("active");
-    } else if (activeTab == "forecast") {
-        $("#homeButton").removeClass("active");
+    }
+    else if (path.includes("forecast.html")) {
         $("#forecastButton").addClass("active");
-        $("#configButton").removeClass("active");
-    } else if (activeTab == "config") {
-        $("#homeButton").removeClass("active");
-        $("#forecastButton").removeClass("active");
+    }
+    else if (path.includes("config.html")) {
         $("#configButton").addClass("active");
     }
 });

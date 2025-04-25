@@ -16,17 +16,18 @@
 
 
 <body>
+    <!-- Navbar panel-->
     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab"
+            <button class="nav-link" data-bs-target="#pills-home" type="button" role="tab"
                 aria-controls="pills-home" aria-selected="true" id="homeButton">Home</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#pills-forecast" type="button" role="tab"
+            <button class="nav-link" data-bs-target="#pills-forecast" type="button" role="tab"
                 aria-controls="pills-forecast" aria-selected="false" id="forecastButton">Forecast</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#pills-config" type="button" role="tab"
+            <button class="nav-link" data-bs-target="#pills-config" type="button" role="tab"
                 aria-controls="pills-config" aria-selected="false" id="configButton">Config</button>
         </li>
     </ul>
@@ -36,6 +37,7 @@
         <div class="tab-pane fade" id="pills-config" role="tabpanel" aria-labelledby="pills-config-tab"></div>
     </div>
 
+    <!-- Main header-->
     <div class="text-center mb-4">
         <h1 class="main-heading text-info">
             Smart-Weather Service
@@ -43,6 +45,7 @@
         <hr>
     </div>
 
+    <!-- Time: Sunrise,Timer,Sunset-->
     <div class="row">
         <div class="text-center col-md-4">
             <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="yellow"
@@ -71,13 +74,13 @@
     </div>
     <hr>
 
-
+    <!-- Date / Location -->
     <div class="row">
         <div class="text-center mb-4">
             <span class="display-5 text-info" id="location">Location - Date</span>
         </div>
     </div>
-
+    <!-- Basic weather information-->
     <div class="container-fluid mt-4">
         <div class="row">
             <div class="col-md-3 text-left border-end">
@@ -92,12 +95,14 @@
                 <p><strong>Pressure:</strong> <span id="pressure-value">-- hPa</span></p>
                 <p><strong>Humidity:</strong> <span id="humidity-value">-- %</span></p>
             </div>
+
+            <!-- Temperature chart-->
             <div class="col-md-5 text-center">
                 <h5 class="text-teal">Temperature Chart</h5>
                 <canvas id="temperatureChart" width="400" height="200"></canvas>
 
             </div>
-
+            <!-- Rain chart-->
             <div class="col-md-4 text-center">
                 <h5 class="text-teal">Rain / Cloud Chart</h5>
                 <canvas id="rainCloudChart" width="400" height="200"></canvas>
