@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.Map;
 
 @Getter
@@ -18,5 +19,5 @@ public class AppConfig {
 
     private String rootPassword;
 
-    private Map<String,String> config;
+    private Map<String, String> config;
 }

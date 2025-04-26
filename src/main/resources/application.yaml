@@ -17,7 +17,7 @@ weather:
   url: http://api.weatherapi.com/v1
 security:
   API_KEY: ${WEATHER_KEY}
-  salt: "GH$LS1$#ghGEOUIY#12sdgsdhSD46hgOUI;l<H"
+  salt: "GH$LS1$#ghGEOUIY#12sdgsdhSD46hgO"
 userData:
   location: Bialystok
   userEmail: ${ADMIN_EMAIL}

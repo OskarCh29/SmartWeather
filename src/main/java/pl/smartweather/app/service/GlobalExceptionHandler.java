@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import pl.smartweather.app.exception.InvalidConfigurationException;
 import pl.smartweather.app.exception.UserAlreadyExistsException;
 import pl.smartweather.app.exception.UserNotFoundException;
 import pl.smartweather.app.model.GenericServerResponse;
@@ -26,5 +27,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleValidationException(MethodArgumentNotValidException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 new GenericServerResponse("Validation failed - Please enter a valid email"));
+    }
+
+    @ExceptionHandler(InvalidConfigurationException.class)
+    public ResponseEntity<Object> handleInvalidConfigurationException(InvalidConfigurationException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 }

@@ -17,12 +17,15 @@ import java.util.Map;
 public class AppConfigService {
 
     private final MongoTemplate mongoTemplate;
+    private final CryptoService cryptoService;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
 
     @Value("${security.salt}")
     private String salt;
     private AppConfig appConfig;
 
-    @PostConstruct
+
     public void load() {
         this.appConfig = mongoTemplate.findById("app_config", AppConfig.class);
         if (!isInitialized()) {
@@ -30,36 +33,45 @@ public class AppConfigService {
         }
     }
 
-    public boolean isInitialized() {
-        return appConfig != null && appConfig.isInitialized();
+    public Map<String, String> getConfig() {
+        Map<String, String> config = new HashMap<>();
+
+        appConfig.getConfig().forEach((k, v) -> {
+            if (k.equals("mail_pass") || k.equals("api_key")) {
+                config.put(k, cryptoService.decrypt(k));
+            } else {
+                config.put(k, v);
+            }
+        });
+        return config;
     }
 
-    public void configure(Map<String, String> values, String rootPassword) {
+    public void setupAppConfiguration(Map<String, String> configValues, String rootPassword) {
         if (!isInitialized()) {
-            String hashedPassword = new BCryptPasswordEncoder().encode(salt + rootPassword);
+            String hashedPassword = passwordEncoder.encode(salt + rootPassword);
             Map<String, String> encrypted = new HashMap<>();
-            values.forEach((k, v) -> {
+            configValues.forEach((k, v) -> {
                 if (k.equals("mail_pass") || k.equals("api_key")) {
-
+                    encrypted.put(k, cryptoService.encrypt(v));
                 } else {
                     encrypted.put(k, v);
                 }
-                AppConfig config = new AppConfig();
-                config.setRootPassword(hashedPassword);
-                config.setInitialized(true);
-                config.setConfig(values);
-
-                mongoTemplate.save(config);
-                this.appConfig = config;
             });
+            AppConfig config = new AppConfig();
+            config.setRootPassword(hashedPassword);
+            config.setInitialized(true);
+            config.setConfig(encrypted);
+
+            mongoTemplate.save(config);
+            this.appConfig = config;
         } else {
-            if (!new BCryptPasswordEncoder().matches(salt + rootPassword, appConfig.getRootPassword())) {
+            if (!passwordEncoder.matches(salt + rootPassword, appConfig.getRootPassword())) {
                 throw new SecurityException("Invalid password");
             }
             Map<String, String> updateConfig = new HashMap<>();
-            values.forEach((k, v) -> {
+            configValues.forEach((k, v) -> {
                 if (k.equals("mail_pass") || k.equals("api_key")) {
-
+                    updateConfig.put(k, cryptoService.encrypt(v));
                 } else {
                     updateConfig.put(k, v);
                 }
@@ -69,4 +81,7 @@ public class AppConfigService {
         }
     }
 
+    private boolean isInitialized() {
+        return appConfig != null && appConfig.isInitialized();
+    }
 }
