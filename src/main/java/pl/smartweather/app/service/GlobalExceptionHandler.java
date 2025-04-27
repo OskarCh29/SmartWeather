@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleValidationException(MethodArgumentNotValidException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new GenericServerResponse("Validation failed - Please enter a valid email"));
+                new GenericServerResponse("Validation failed - Check data requirements"));
     }
 
     @ExceptionHandler(ConfigurationException.class)

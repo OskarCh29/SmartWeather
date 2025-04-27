@@ -17,6 +17,9 @@ import java.util.Base64;
 @Service
 @RequiredArgsConstructor
 public class CryptoService {
+    private static final int DECODE_KEY_LENGTH = 32;
+    private static final int VECTOR_IV_LENGTH = 12;
+    private static final int AUTHENTICATION_TAG = 128;
 
     @Value("${security.salt}")
     private String cryptoKey;
@@ -26,7 +29,7 @@ public class CryptoService {
     @PostConstruct
     public void init() {
         byte[] decodeKey = cryptoKey.getBytes();
-        if (decodeKey.length != 32) {
+        if (decodeKey.length != DECODE_KEY_LENGTH) {
             throw new SecurityException("Invalid AES key length. Key must be 32 bytes");
         }
         this.secretKey = new SecretKeySpec(decodeKey, "AES");
@@ -35,11 +38,11 @@ public class CryptoService {
     public String encrypt(String text) {
         try {
             Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-            byte[] iv = new byte[12];
+            byte[] iv = new byte[VECTOR_IV_LENGTH];
             SecureRandom random = new SecureRandom();
             random.nextBytes(iv);
 
-            GCMParameterSpec parameterSpec = new GCMParameterSpec(128, iv);
+            GCMParameterSpec parameterSpec = new GCMParameterSpec(AUTHENTICATION_TAG, iv);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, parameterSpec);
 
             byte[] cipherText = cipher.doFinal(text.getBytes(StandardCharsets.UTF_8));
@@ -58,19 +61,19 @@ public class CryptoService {
         try {
             byte[] decoded = Base64.getDecoder().decode(encryptedText);
 
-            byte[] iv = Arrays.copyOfRange(decoded, 0, 12);
+            byte[] iv = Arrays.copyOfRange(decoded, 0, VECTOR_IV_LENGTH);
 
-            byte[] cipherText = Arrays.copyOfRange(decoded, 12, decoded.length);
+            byte[] cipherText = Arrays.copyOfRange(decoded, VECTOR_IV_LENGTH, decoded.length);
 
             Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-            GCMParameterSpec parameterSpec = new GCMParameterSpec(128, iv);
+            GCMParameterSpec parameterSpec = new GCMParameterSpec(AUTHENTICATION_TAG, iv);
             cipher.init(Cipher.DECRYPT_MODE, secretKey, parameterSpec);
 
             byte[] plainText = cipher.doFinal(cipherText);
 
-            return new String(plainText,StandardCharsets.UTF_8);
-        } catch (Exception e){
-            throw new SecurityException("Error occurred while decrypting configuration: " +e);
+            return new String(plainText, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new SecurityException("Error occurred while decrypting configuration: " + e);
         }
     }
 }

@@ -1,94 +1,27 @@
+let settingsUnlocked = false;
 $(document).ready(function () {
 
-    // Load users from database
-    LoadUserTable();
+    // Check if already configurated
     checkConfigStatus();
 
-
-    // Adding new User function
-    $("#addUserForm").click(function (e) {
+    $("#unlockSettings").click(function (e) {
         e.preventDefault();
-        $("#addUserModal").modal('show');
-
-        $("#addUser").submit(function (e) {
-            e.preventDefault();
-            $("#addUser").prop("disabled", true)
-            const newUser = {
-                emailAddress: $("#email").val()
-            }
-
-            $.ajax({
-                type: "POST",
-                url: "http://localhost:8080/user",
-                data: JSON.stringify(newUser),
-                contentType: "application/json",
-                success: function () {
-                    $("#addUserModal").modal('hide');
-                    LoadUserTable();
-                    $("#errorMessage").hide().text("");
-                    $("#addUser").prop("disabled", false);
-                    $("#addUser")[0].reset();
-                },
-                error: function (xhr) {
-                    $("#addUserModal button[type=submit]").prop("disabled", false);
-                    if (xhr.responseText.includes("Email already in use")) {
-                        $("#errorMessage").text("User with this email already exists").show();
-                        $("#addUser").prop("disabled", false);
-                    } else {
-                        $("#errorMessage").text("Error while saving new user").show()
-
-                    }
-
-                }
-            });
-        });
+        if (settingsUnlocked) {
+            lockSettings();
+        }
+        else {
+            $("#passwordConfig").modal('show');
+        }
     });
+    $("#updateConfig").submit(function (e) {
+        e.preventDefault();
+        validateRootPassword($("#rootConfig").val());
+
+    });
+
+
+
 });
-function LoadUserTable() {
-    $.ajax({
-        type: "GET",
-        url: "http://localhost:8080/users",
-        dataType: "json",
-        success: function (response) {
-            let tableContent = '';
-            response.forEach((user, index) => {
-                tableContent += `
-    <tr>
-    <td>${index + 1}</td>
-    <td>${user.emailAddress}</td>
-    <td>
-    <a class="btn btn-danger btn-sm deleteUser" data-email="${user.emailAddress}">Delete</a>
-    </td>
-    </tr>`;
-                $("table tbody").html(tableContent);
-            });
-            $(".deleteUser").click(function () {
-                let email = $(this).data("email");
-                deleteUser(email);
-            })
-
-        }, error: function (xhr, status, error) {
-            console.error("Database error while loading users - Check users in database");
-            console.log("Error:" + error + "Status:" + status, xhr)
-        }
-    });
-}
-
-function deleteUser(email) {
-    $.ajax({
-        type: "DELETE",
-        url: "http://localhost:8080/user",
-        data: JSON.stringify({ emailAddress: email }),
-        contentType: "application/json",
-        success: function () {
-            LoadUserTable();
-        },
-        error: function (xhr, error, status) {
-            console.error("Error while deleting user:" + error);
-            console.log("Deleting error:" + xhr.responseText);
-        }
-    });
-}
 
 function checkConfigStatus() {
     $.ajax({
@@ -99,7 +32,7 @@ function checkConfigStatus() {
             document.getElementById("mailHost").textContent = response.mail_host;
             document.getElementById("mailPort").textContent = response.mail_port;
             document.getElementById("mailName").textContent = response.mail_name;
-        }, error: function (xhr, status, error) {
+        }, error: function (xhr, status) {
             if (xhr.responseText.includes("Application settings not configured")) {
                 $("#configurationModal").modal('show');
                 checkPassword();
@@ -107,9 +40,6 @@ function checkConfigStatus() {
                     e.preventDefault();
                     updateRootPassword();
                 });
-
-            } else {
-                console.error("Error occured while loading basic configuration:" + error);
             }
 
         }
@@ -125,11 +55,10 @@ function updateRootPassword() {
         data: JSON.stringify(rootPassword),
         contentType: "application/json",
         success: function () {
-            $("#rootPassowrd")[0].reset();
+            $("#rootPassword")[0].reset();
             $("#configurationModal").modal('hide');
-        }, error: function(xhr, status, error){
+        }, error: function () {
             console.log("Password was previously configured");
-            console.log(JSON.stringify(rootPassword));
         }
     });
 }
@@ -166,3 +95,65 @@ function checkPassword() {
     });
 
 };
+
+function validateRootPassword(password) {
+    const rootPass = {
+        rootPassword: password
+    }
+    $.ajax({
+        type: "POST",
+        url: "http://localhost:8080/config/validate",
+        data: JSON.stringify(rootPass),
+        contentType: "application/json",
+        success: function () {
+            $("#wrongPassword").hide();
+            $("#passwordConfig").modal('hide');
+            unlockSettings();
+
+        }, error: function (xhr) {
+            if (xhr.responseText.includes("Invalid password")) {
+                $("#wrongPassword").text("Password incorrect").show();
+            }
+        }
+    });
+}
+
+function unlockSettings() {
+    $("#mailHost, #mailPort, #mailName, #mailPassword, #apiKey").prop("disabled", false);
+
+    $("#unlockSettings").removeClass("btn-outline-warning").addClass("btn-outline-success")
+        .text("🔒 Lock main settings")
+
+    settingsUnlocked = true;
+}
+
+function lockSettings() {
+    const configuration = {
+        newConfig: {
+            "mail_host": $("#mailHost").val(),
+            "mail_port": $("#mailPort").val(),
+            "mail_name": $("#mailName").val(),
+            "mail_pass": $("#mailPassword").val(),
+            "api_key": $("#apiKey").val()
+        }
+    }
+
+    $.ajax({
+        type: "POST",
+        url: "http://localhost:8080/config",
+        data: JSON.stringify(configuration),
+        contentType: "application/json",
+        success: function () {
+            $("#mailHost,#mailPort, #mailName, #mailPassword,#apiKey").prop("disabled", true);
+            $("#unlockSettings").removeClass("btn-outline-warning").addClass("btn-outline-success")
+                .text("🔓 Unlock main settings");
+
+            settingsUnlocked = false;
+            checkConfigStatus();
+
+        }, error: function () {
+            console.log("Error");
+        }
+    });
+}
+

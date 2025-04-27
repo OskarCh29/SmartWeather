@@ -79,27 +79,27 @@
                         <label for="locationInput" class="form-label">Location:</label>
                         <div class="input-group">
                             <input type="text" class="form-control" id="locationInput" placeholder="" disabled>
-                            <button class="btn btn-outline-primary" type="button" id="unlockLocation">🔓</button>
+                            <button class="btn btn-outline-warning" type="button" id="unlockLocation">🔓</button>
                         </div>
                     </div>
 
                     <div class="mb-4">
                         <label for="mailHost" class="form-label">Host:</label>
-                        <input type="text" class="form-control mb-2" id="mailHost" placeholder="" disabled>
+                        <input type="text" class="form-control mb-2" id="mailHost" placeholder="" disabled required>
 
                         <label for="mailPort" class="form-label">Port:</label>
-                        <input type="text" class="form-control mb-2" id="mailPort" placeholder="587" disabled>
+                        <input type="text" class="form-control mb-2" id="mailPort" placeholder="587" disabled required>
 
                         <label for="mailName" class="form-label">Sender mail:</label>
-                        <input type="text" class="form-control mb-2" id="mailName" placeholder="" disabled>
+                        <input type="text" class="form-control mb-2" id="mailName" placeholder="" disabled required>
 
                         <label for="mailPassword" class="form-label">Password:</label>
                         <input type="password" class="form-control mb-2" id="mailPassword" placeholder="*************"
-                            disabled>
+                            disabled required>
 
                         <label for="apiKey" class="form-label">API Key:</label>
                         <input type="password" class="form-control mb-2" id="apiKey" placeholder="*************"
-                            disabled>
+                            disabled required>
 
                         <button class="btn btn-outline-warning mt-2" id="unlockSettings">🔓 Unlock main
                             settings</button>
@@ -159,7 +159,6 @@
                             </p>
 
                         </div>
-                        <div id="rootErrorMessage" class="text-danger" style="display:none"></div>
                     </form>
                 </div>
                 <!-- Modal buttons-->
@@ -170,12 +169,36 @@
         </div>
     </div>
 
-
-
-
+    <!--Root settings modal -->
+    <div class="modal fade" id="passwordConfig" tabindex="-1" aria-labelledby="passwordConfigLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="passwordConfigLabel">Enter security password:</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <!--Password form && ErrorMessage-->
+                <div class="modal-body">
+                    <form id="updateConfig">
+                        <div class="mb-3">
+                            <label for="rootConfig" class="form-label">Password:</label>
+                            <input type="password" class="form-control" id="rootConfig" required>
+                        </div>
+                        <div id="wrongPassword" class="text-danger" style="display:none" aria-live="polite"></div>
+                    </form>
+                </div>
+                <!-- Modal buttons-->
+                <div class="modal-footer">
+                    <button type="submit" form="updateConfig" class="btn btn-primary">Unlock settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
 
     <script src="scripts/navBarScript.js"></script>
     <script src="scripts/configScript.js"></script>
+    <script src="scripts/userConfigScript.js"></script>
 </body>
 
 </html>

@@ -1,13 +1,11 @@
 package pl.smartweather.app;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import pl.smartweather.app.entity.AppConfig;
 import pl.smartweather.app.entity.Weather;
 import pl.smartweather.app.service.AppConfigService;
 import pl.smartweather.app.service.EmailService;
@@ -16,7 +14,6 @@ import pl.smartweather.app.service.WeatherService;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
 
 @Slf4j
 @Component
@@ -34,8 +31,6 @@ public class DailyForecastScheduler {
 
     @Value("${userData.secondUserEmail}")
     private String secondUserEmail;
-
-
 
     @Scheduled(cron = "0 0 8 * * *")
     public void sendInfoMail() {

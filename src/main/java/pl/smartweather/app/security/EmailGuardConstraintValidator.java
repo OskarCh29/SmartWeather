@@ -7,8 +7,8 @@ import org.apache.commons.validator.routines.EmailValidator;
 public class EmailGuardConstraintValidator implements ConstraintValidator<EmailGuard, String> {
 
     @Override
-    public boolean isValid(String email, ConstraintValidatorContext constraintValidatorContext) {
-        if(email == null || email.isBlank()){
+    public boolean isValid(String email, ConstraintValidatorContext context) {
+        if (email == null || email.isBlank()) {
             return false;
         }
         EmailValidator validator = EmailValidator.getInstance();

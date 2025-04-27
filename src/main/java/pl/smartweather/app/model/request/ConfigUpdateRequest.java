@@ -3,6 +3,7 @@ package pl.smartweather.app.model.request;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import pl.smartweather.app.security.ProperConfig;
 
 import java.util.Map;
 
@@ -12,5 +13,7 @@ import java.util.Map;
 public class ConfigUpdateRequest {
 
     private String rootPassword;
+
+    @ProperConfig
     private Map<String, String> newConfig;
 }

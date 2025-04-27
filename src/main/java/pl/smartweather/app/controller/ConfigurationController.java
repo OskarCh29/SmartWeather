@@ -23,13 +23,20 @@ public class ConfigurationController {
     private final EmailService emailService;
 
     @GetMapping("/config")
-    public ResponseEntity<Map<String,String>> checkConfigStatus() {
+    public ResponseEntity<Map<String, String>> checkConfigStatus() {
         appConfigService.checkConfigStatus();
         return ResponseEntity.ok(appConfigService.getAppProperties());
     }
 
+    @PostMapping("/config/validate")
+    public ResponseEntity<GenericServerResponse> validateRootPassword(
+            @RequestBody @Valid RootPasswordRequest rootRequest) {
+        appConfigService.validateRootPassword(rootRequest.getRootPassword());
+        return ResponseEntity.ok(new GenericServerResponse("Root validated"));
+    }
+
     @PostMapping("/config/root")
-    public ResponseEntity<GenericServerResponse> setRootPassword(@RequestBody RootPasswordRequest rootPass) {
+    public ResponseEntity<GenericServerResponse> setRootPassword(@RequestBody @Valid RootPasswordRequest rootPass) {
         appConfigService.setRootPassword(rootPass.getRootPassword());
         return ResponseEntity.ok(new GenericServerResponse("Root password updated"));
     }
@@ -42,9 +49,10 @@ public class ConfigurationController {
     }
 
     @PostMapping("/config")
-    public ResponseEntity<GenericServerResponse> setupConfiguration(@RequestBody @Valid ConfigUpdateRequest configRequest) {
+    public ResponseEntity<GenericServerResponse> setupConfiguration(
+            @RequestBody @Valid ConfigUpdateRequest configRequest) {
         emailService.sendConfigurationNotification(configRequest.getNewConfig().get("mail_name"));
-        appConfigService.setupAppConfiguration(configRequest.getNewConfig(), configRequest.getRootPassword());
+        appConfigService.setupAppConfiguration(configRequest.getNewConfig());
         return ResponseEntity.status(HttpStatus.CREATED).body(new GenericServerResponse("Configuration provided"));
     }
 }

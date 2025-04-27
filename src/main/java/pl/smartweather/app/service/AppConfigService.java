@@ -22,7 +22,6 @@ public class AppConfigService {
     private final CryptoService cryptoService;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-
     @Value("${security.salt}")
     private String salt;
 
@@ -42,15 +41,17 @@ public class AppConfigService {
         if (!appConfig.isInitialized() && appConfig.getRootPassword() == null) {
             throw new ConfigurationException("Application settings not configured");
         }
+        if (appConfig.getConfig() == null) {
+            throw new ConfigurationException("First configuration not provided yet");
+        }
     }
-
 
     public Map<String, String> getAppProperties() {
         Map<String, String> properties = new HashMap<>();
 
         appConfig.getConfig().forEach((k, v) -> {
             if (k.equals("mail_pass") || k.equals("api_key")) {
-                properties.put(k, cryptoService.decrypt(k));
+                properties.put(k, cryptoService.decrypt(v));
             } else {
                 properties.put(k, v);
             }
@@ -58,10 +59,7 @@ public class AppConfigService {
         return properties;
     }
 
-    public void setupAppConfiguration(Map<String, String> configValues, String rootPassword) {
-        if (!passwordEncoder.matches(salt + rootPassword, appConfig.getRootPassword())) {
-            throw new SecurityException("Invalid password");
-        }
+    public void setupAppConfiguration(Map<String, String> configValues) {
         Map<String, String> updateConfig = new HashMap<>();
         configValues.forEach((k, v) -> {
             if (k.equals("mail_pass") || k.equals("api_key")) {
@@ -73,7 +71,6 @@ public class AppConfigService {
         appConfig.setConfig(updateConfig);
         appConfig.setInitialized(true);
         mongoTemplate.save(appConfig);
-
     }
 
     public void setRootPassword(String rootPassword) {
@@ -86,5 +83,10 @@ public class AppConfigService {
         }
     }
 
+    public void validateRootPassword(String rootPassword) {
+        if (!passwordEncoder.matches(salt + rootPassword, appConfig.getRootPassword())) {
+            throw new SecurityException("Invalid password");
+        }
+    }
 
 }
