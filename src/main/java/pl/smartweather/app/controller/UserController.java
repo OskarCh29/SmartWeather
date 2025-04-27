@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.smartweather.app.entity.User;
-import pl.smartweather.app.model.GenericServerResponse;
+import pl.smartweather.app.model.response.GenericServerResponse;
 import pl.smartweather.app.service.UserService;
 
 import java.util.List;

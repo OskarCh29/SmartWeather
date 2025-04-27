@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import pl.smartweather.app.model.WeatherResponse;
+import pl.smartweather.app.model.response.WeatherResponse;
 
 @Getter
 @Setter

@@ -15,9 +15,9 @@ public class AppConfig {
     @Id
     private String id = "app_config";
 
-    private boolean initialized;
-
     private String rootPassword;
+
+    private boolean initialized;
 
     private Map<String, String> config;
 }

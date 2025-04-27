@@ -12,7 +12,6 @@
         integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
         crossorigin="anonymous"></script>
     <link rel="stylesheet" href="style/GlobalStyle.css">
-    </style>
 </head>
 
 
@@ -109,7 +108,7 @@
         </div>
     </div>
 
-    <!-- Modal -->
+    <!--Add User Modal -->
     <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -121,10 +120,10 @@
                 <div class="modal-body">
                     <form id="addUser">
                         <div class="mb-3">
-                            <label for="username" class="form-label">User e-mail</label>
+                            <label for="email" class="form-label">User e-mail</label>
                             <input type="email" class="form-control" id="email" required>
                         </div>
-                        <div id="errorMessage" class="text-danger" style="display:none"></div>
+                        <div id="errorMessage" class="text-danger" style="display:none" aria-live="polite"></div>
                     </form>
                 </div>
                 <!-- Modal buttons-->
@@ -135,6 +134,42 @@
             </div>
         </div>
     </div>
+
+    <!-- Config Modal -->
+    <div class="modal fade" id="configurationModal" tabindex="-1" aria-labelledby="configurationModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="configurationModalLabel">Admin Configuration</h5>
+                </div>
+                <!--Password init form && ErrorMessage-->
+                <div class="modal-body">
+                    <form id="rootPassword">
+                        <div class="mb-3">
+                            <label for="root" class="form-label">Admin password:</label>
+                            <input type="password" class="form-control" id="root" required>
+                            <p class="text-danger"><strong>• Once you submit admin password it cannot be
+                                    changed</strong></p>
+                            <p>Password requirements:</p>
+                            <p id="correctLength">• At least 6 characters</p>
+                            <p id="capitalLetter">• At least one capital letter</p>
+                            <p id="oneDigit">• At least one digit</p>
+                            <p>• Without admin password you will not be able to change configuration and start your app
+                            </p>
+
+                        </div>
+                        <div id="rootErrorMessage" class="text-danger" style="display:none"></div>
+                    </form>
+                </div>
+                <!-- Modal buttons-->
+                <div class="modal-footer">
+                    <button type="submit" form="rootPassword" class="btn btn-primary" disabled>Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 
 

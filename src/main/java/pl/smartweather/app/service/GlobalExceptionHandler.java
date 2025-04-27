@@ -5,10 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import pl.smartweather.app.exception.InvalidConfigurationException;
+import pl.smartweather.app.exception.ConfigurationException;
 import pl.smartweather.app.exception.UserAlreadyExistsException;
 import pl.smartweather.app.exception.UserNotFoundException;
-import pl.smartweather.app.model.GenericServerResponse;
+import pl.smartweather.app.model.response.GenericServerResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -29,8 +29,13 @@ public class GlobalExceptionHandler {
                 new GenericServerResponse("Validation failed - Please enter a valid email"));
     }
 
-    @ExceptionHandler(InvalidConfigurationException.class)
-    public ResponseEntity<Object> handleInvalidConfigurationException(InvalidConfigurationException e) {
+    @ExceptionHandler(ConfigurationException.class)
+    public ResponseEntity<Object> handleInvalidConfigurationException(ConfigurationException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Object> handleSecurityException(SecurityException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
 }

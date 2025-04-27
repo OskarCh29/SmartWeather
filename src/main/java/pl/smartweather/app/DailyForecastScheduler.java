@@ -38,9 +38,12 @@ public class DailyForecastScheduler {
 
 
     @Scheduled(cron = "0 0 8 * * *")
-    @PostConstruct
     public void sendInfoMail() {
         try {
+//            if(!appConfigService.isInitialized()){
+//                log.warn("Application not configured. Skipping sending daily forecast");
+//                return;
+//            }
             String today = DateTimeFormatter.ISO_DATE.format(LocalDate.now());
             weatherService.saveWeatherRecord(location);
             Weather weather = weatherService.findWeatherByLocationAndDate(location, today);

@@ -1,4 +1,4 @@
-package pl.smartweather.app.model;
+package pl.smartweather.app.model.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

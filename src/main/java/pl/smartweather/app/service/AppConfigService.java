@@ -2,16 +2,18 @@ package pl.smartweather.app.service;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.smartweather.app.entity.AppConfig;
-import pl.smartweather.app.exception.InvalidConfigurationException;
+import pl.smartweather.app.exception.ConfigurationException;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AppConfigService {
@@ -23,65 +25,66 @@ public class AppConfigService {
 
     @Value("${security.salt}")
     private String salt;
+
     private AppConfig appConfig;
 
-
-    public void load() {
+    @PostConstruct
+    public void init() {
         this.appConfig = mongoTemplate.findById("app_config", AppConfig.class);
-        if (!isInitialized()) {
-            throw new InvalidConfigurationException("Application not configured");
+        if (appConfig == null) {
+            appConfig = new AppConfig();
+            mongoTemplate.save(appConfig);
+            log.info("First configuration - Initializing empty config file");
         }
     }
 
-    public Map<String, String> getConfig() {
-        Map<String, String> config = new HashMap<>();
+    public void checkConfigStatus() {
+        if (!appConfig.isInitialized() && appConfig.getRootPassword() == null) {
+            throw new ConfigurationException("Application settings not configured");
+        }
+    }
+
+
+    public Map<String, String> getAppProperties() {
+        Map<String, String> properties = new HashMap<>();
 
         appConfig.getConfig().forEach((k, v) -> {
             if (k.equals("mail_pass") || k.equals("api_key")) {
-                config.put(k, cryptoService.decrypt(k));
+                properties.put(k, cryptoService.decrypt(k));
             } else {
-                config.put(k, v);
+                properties.put(k, v);
             }
         });
-        return config;
+        return properties;
     }
 
     public void setupAppConfiguration(Map<String, String> configValues, String rootPassword) {
-        if (!isInitialized()) {
-            String hashedPassword = passwordEncoder.encode(salt + rootPassword);
-            Map<String, String> encrypted = new HashMap<>();
-            configValues.forEach((k, v) -> {
-                if (k.equals("mail_pass") || k.equals("api_key")) {
-                    encrypted.put(k, cryptoService.encrypt(v));
-                } else {
-                    encrypted.put(k, v);
-                }
-            });
-            AppConfig config = new AppConfig();
-            config.setRootPassword(hashedPassword);
-            config.setInitialized(true);
-            config.setConfig(encrypted);
-
-            mongoTemplate.save(config);
-            this.appConfig = config;
-        } else {
-            if (!passwordEncoder.matches(salt + rootPassword, appConfig.getRootPassword())) {
-                throw new SecurityException("Invalid password");
+        if (!passwordEncoder.matches(salt + rootPassword, appConfig.getRootPassword())) {
+            throw new SecurityException("Invalid password");
+        }
+        Map<String, String> updateConfig = new HashMap<>();
+        configValues.forEach((k, v) -> {
+            if (k.equals("mail_pass") || k.equals("api_key")) {
+                updateConfig.put(k, cryptoService.encrypt(v));
+            } else {
+                updateConfig.put(k, v);
             }
-            Map<String, String> updateConfig = new HashMap<>();
-            configValues.forEach((k, v) -> {
-                if (k.equals("mail_pass") || k.equals("api_key")) {
-                    updateConfig.put(k, cryptoService.encrypt(v));
-                } else {
-                    updateConfig.put(k, v);
-                }
-            });
-            appConfig.setConfig(updateConfig);
+        });
+        appConfig.setConfig(updateConfig);
+        appConfig.setInitialized(true);
+        mongoTemplate.save(appConfig);
+
+    }
+
+    public void setRootPassword(String rootPassword) {
+        if (appConfig.getRootPassword() == null) {
+            String hashedPassword = passwordEncoder.encode(salt + rootPassword);
+            appConfig.setRootPassword(hashedPassword);
             mongoTemplate.save(appConfig);
+        } else {
+            throw new ConfigurationException("Root password was already initialized");
         }
     }
 
-    private boolean isInitialized() {
-        return appConfig != null && appConfig.isInitialized();
-    }
+
 }

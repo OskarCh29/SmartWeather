@@ -2,6 +2,7 @@ $(document).ready(function () {
 
     // Load users from database
     LoadUserTable();
+    checkConfigStatus();
 
 
     // Adding new User function
@@ -35,7 +36,7 @@ $(document).ready(function () {
                         $("#addUser").prop("disabled", false);
                     } else {
                         $("#errorMessage").text("Error while saving new user").show()
-                        
+
                     }
 
                 }
@@ -88,3 +89,80 @@ function deleteUser(email) {
         }
     });
 }
+
+function checkConfigStatus() {
+    $.ajax({
+        type: "GET",
+        url: "http://localhost:8080/config",
+        dataType: "json",
+        success: function (response) {
+            document.getElementById("mailHost").textContent = response.mail_host;
+            document.getElementById("mailPort").textContent = response.mail_port;
+            document.getElementById("mailName").textContent = response.mail_name;
+        }, error: function (xhr, status, error) {
+            if (xhr.responseText.includes("Application settings not configured")) {
+                $("#configurationModal").modal('show');
+                checkPassword();
+                $("#rootPassword").submit(function (e) {
+                    e.preventDefault();
+                    updateRootPassword();
+                });
+
+            } else {
+                console.error("Error occured while loading basic configuration:" + error);
+            }
+
+        }
+    });
+}
+function updateRootPassword() {
+    const rootPassword = {
+        rootPassword: $("#root").val()
+    }
+    $.ajax({
+        type: "POST",
+        url: "http://localhost:8080/config/root",
+        data: JSON.stringify(rootPassword),
+        contentType: "application/json",
+        success: function () {
+            $("#rootPassowrd")[0].reset();
+            $("#configurationModal").modal('hide');
+        }, error: function(xhr, status, error){
+            console.log("Password was previously configured");
+            console.log(JSON.stringify(rootPassword));
+        }
+    });
+}
+
+function updatePasswordValidation(elementId, isValid) {
+    const element = $("#" + elementId);
+    if (isValid) {
+        element.addClass("req-Meet");
+    } else {
+        element.removeClass("req-Meet");
+    }
+}
+function checkPassword() {
+    const input = document.getElementById('root');
+    const saveButton = document.querySelector('button[form="rootPassword"]');
+
+    input.addEventListener('input', () => {
+        const value = input.value;
+
+        const isLengthValid = value.length >= 6;
+        const hasCapitalLetter = /[A-Z]/.test(value);
+        const hasDigit = /\d/.test(value);
+
+        updatePasswordValidation("correctLength", isLengthValid);
+        updatePasswordValidation("capitalLetter", hasCapitalLetter);
+        updatePasswordValidation("oneDigit", hasDigit);
+
+        if (isLengthValid && hasCapitalLetter && hasDigit) {
+            saveButton.disabled = false;
+        }
+        else {
+            saveButton.disabled = true;
+        }
+    });
+
+};
