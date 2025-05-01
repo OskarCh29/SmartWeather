@@ -1,4 +1,5 @@
 let settingsUnlocked = false;
+let locationUnlocked = false;
 $(document).ready(function () {
 
     // Check if already configurated
@@ -16,23 +17,32 @@ $(document).ready(function () {
     $("#updateConfig").submit(function (e) {
         e.preventDefault();
         validateRootPassword($("#rootConfig").val());
-
     });
 
-
+    $("#unlockLocation").click(function (e) {
+        if (locationUnlocked) {
+            e.preventDefault();
+            lockLocation();
+        } else {
+            unlockLocation();
+        }
+    })
 
 });
 
+// Check config
 function checkConfigStatus() {
     $.ajax({
         type: "GET",
         url: "http://localhost:8080/config",
         dataType: "json",
         success: function (response) {
-            document.getElementById("mailHost").textContent = response.mail_host;
-            document.getElementById("mailPort").textContent = response.mail_port;
-            document.getElementById("mailName").textContent = response.mail_name;
-        }, error: function (xhr, status) {
+            console.log(response);
+            document.getElementById("locationInput").value = response.location;
+            document.getElementById("mailHost").value = response.config.mail_host;
+            document.getElementById("mailPort").value = response.config.mail_port;
+            document.getElementById("mailName").value = response.config.mail_name;
+        }, error: function (xhr) {
             if (xhr.responseText.includes("Application settings not configured")) {
                 $("#configurationModal").modal('show');
                 checkPassword();
@@ -45,6 +55,7 @@ function checkConfigStatus() {
         }
     });
 }
+// Update Root Password - First configuration
 function updateRootPassword() {
     const rootPassword = {
         rootPassword: $("#root").val()
@@ -62,7 +73,7 @@ function updateRootPassword() {
         }
     });
 }
-
+// Validate RootPassword by front req
 function updatePasswordValidation(elementId, isValid) {
     const element = $("#" + elementId);
     if (isValid) {
@@ -71,6 +82,7 @@ function updatePasswordValidation(elementId, isValid) {
         element.removeClass("req-Meet");
     }
 }
+// Password checker function - colors for requirements
 function checkPassword() {
     const input = document.getElementById('root');
     const saveButton = document.querySelector('button[form="rootPassword"]');
@@ -95,7 +107,7 @@ function checkPassword() {
     });
 
 };
-
+// Send root password to server - Validation
 function validateRootPassword(password) {
     const rootPass = {
         rootPassword: password
@@ -111,23 +123,26 @@ function validateRootPassword(password) {
             unlockSettings();
 
         }, error: function (xhr) {
-            if (xhr.responseText.includes("Invalid password")) {
+            if (xhr.responseText.includes("Password not valid - Check Requirements")) {
                 $("#wrongPassword").text("Password incorrect").show();
             }
         }
     });
 }
 
+// Unlocking root main settings
 function unlockSettings() {
     $("#mailHost, #mailPort, #mailName, #mailPassword, #apiKey").prop("disabled", false);
 
     $("#unlockSettings").removeClass("btn-outline-warning").addClass("btn-outline-success")
-        .text("🔒 Lock main settings")
+        .text("🔓 Lock main settings")
 
     settingsUnlocked = true;
 }
 
+// Lock the root settings + SAVE
 function lockSettings() {
+    $("#unlockSettings").prop("disabled", true)
     const configuration = {
         newConfig: {
             "mail_host": $("#mailHost").val(),
@@ -144,16 +159,67 @@ function lockSettings() {
         data: JSON.stringify(configuration),
         contentType: "application/json",
         success: function () {
+            $("#unlockSettings").prop("disabled", false)
             $("#mailHost,#mailPort, #mailName, #mailPassword,#apiKey").prop("disabled", true);
-            $("#unlockSettings").removeClass("btn-outline-warning").addClass("btn-outline-success")
-                .text("🔓 Unlock main settings");
+            $("#unlockSettings").removeClass("btn-outline-success").addClass("btn-outline-warning")
+                .text("🔒 Unlock main settings");
 
             settingsUnlocked = false;
             checkConfigStatus();
+            $("#status-message").hide();
+            $("#status-message").text("")
 
-        }, error: function () {
-            console.log("Error");
+        }, error: function (xhr) {
+            $("#unlockSettings").prop("disabled", false)
+            $("#status-message").hide();
+            $("#status-message").text("");
+
+            if (xhr.status == 401) {
+                displayStatusMessage("Security error: Unauthorized access to sender mail. Please check your mail configuration");
+            }
+            else if (xhr.status == 403) {
+                displayStatusMessage("Authorization error: Provided API key is invalid - Please check your configuration");
+            }
+            else if (xhr.status == 400) {
+                displayStatusMessage("Incorrect input error: Please check your configuration");
+            }
         }
     });
 }
+function displayStatusMessage(message) {
 
+    $("#status-message").text(message).show();
+}
+
+// Location field
+function unlockLocation() {
+    $("#locationInput").prop("disabled", false);
+    $("#unlockLocation").removeClass("btn-outline-warning").addClass("btn-outline-success")
+        .text("🔓")
+
+    locationUnlocked = true;
+}
+function lockLocation() {
+    $("#unlockLocation").prop("disabled", true)
+    const locationRequest = {
+        location: $("#locationInput").val()
+    }
+    $.ajax({
+        type: "POST",
+        url: "http://localhost:8080/config/location",
+        data: JSON.stringify(locationRequest),
+        contentType: "application/json",
+        success: function () {
+            $("#unlockLocation").removeClass("btn-outline-success").addClass("btn-outline-warning")
+                .text("🔒");
+            $("#locationInput").prop("disabled", true);
+            locationUnlocked = false;
+            $("#location-status").hide();
+        }, error() {
+            $("#location-status").text("Location not found").show(); 
+        },
+        complete: function () {
+            $("#unlockLocation").prop("disabled", false);
+        }
+    });
+}

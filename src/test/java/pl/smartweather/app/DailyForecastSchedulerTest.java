@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 import pl.smartweather.app.entity.Weather;
+import pl.smartweather.app.service.ConfigService;
 import pl.smartweather.app.service.EmailService;
 import pl.smartweather.app.service.WeatherService;
 
@@ -21,6 +22,9 @@ public class DailyForecastSchedulerTest {
     private WeatherService weatherService;
     @MockitoBean
     private EmailService emailService;
+
+    @MockitoBean
+    private ConfigService configService;
 
     @Autowired
     private DailyForecastScheduler scheduler;

@@ -10,9 +10,9 @@ import java.util.Set;
 
 public class ProperConfigConstraintValidator implements ConstraintValidator<ProperConfig, Map<String, String>> {
 
-    private final static int LOWEST_PORT = 0;
-    private final static int HIGHEST_PORT = 65535;
-    private final static int CONFIG_SIZE=5;
+    private static final int LOWEST_PORT = 0;
+    private static final int HIGHEST_PORT = 65535;
+    private static final int CONFIG_SIZE = 5;
 
     @Override
     public boolean isValid(Map<String, String> config, ConstraintValidatorContext context) {
@@ -44,9 +44,8 @@ public class ProperConfigConstraintValidator implements ConstraintValidator<Prop
                     isValid = false;
                 }
             }
-            return isValid;
         }
-        return true;
+        return isValid;
     }
 
     @Override

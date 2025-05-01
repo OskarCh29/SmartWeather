@@ -7,10 +7,7 @@
     <title>Configuration</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
-    <script src="scripts/jquery-3.7.1.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
-        crossorigin="anonymous"></script>
+
     <link rel="stylesheet" href="style/GlobalStyle.css">
 </head>
 
@@ -75,12 +72,14 @@
             <div class="col-md-6">
                 <h3 class="display-6 text-info">Options panel:</h5>
                     <p class="text-teal">Main settings:</p>
+                    <p id="status-message" class="text-danger mt-2" style="display: none;"></p>
                     <div class="mb-4">
                         <label for="locationInput" class="form-label">Location:</label>
                         <div class="input-group">
                             <input type="text" class="form-control" id="locationInput" placeholder="" disabled>
-                            <button class="btn btn-outline-warning" type="button" id="unlockLocation">🔓</button>
+                            <button class="btn btn-outline-warning" type="button" id="unlockLocation">🔒</button>
                         </div>
+                        <p id="location-status" class="text-danger mt-2" style="display: none;"></p>
                     </div>
 
                     <div class="mb-4">
@@ -91,7 +90,7 @@
                         <input type="text" class="form-control mb-2" id="mailPort" placeholder="587" disabled required>
 
                         <label for="mailName" class="form-label">Sender mail:</label>
-                        <input type="text" class="form-control mb-2" id="mailName" placeholder="" disabled required>
+                        <input type="email" class="form-control mb-2" id="mailName" placeholder="" disabled required>
 
                         <label for="mailPassword" class="form-label">Password:</label>
                         <input type="password" class="form-control mb-2" id="mailPassword" placeholder="*************"
@@ -101,7 +100,7 @@
                         <input type="password" class="form-control mb-2" id="apiKey" placeholder="*************"
                             disabled required>
 
-                        <button class="btn btn-outline-warning mt-2" id="unlockSettings">🔓 Unlock main
+                        <button class="btn btn-outline-warning mt-2" id="unlockSettings">🔒 Unlock main
                             settings</button>
                     </div>
             </div>
@@ -194,8 +193,11 @@
             </div>
         </div>
     </div>
-    
 
+    <script src="scripts/jquery-3.7.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
+        crossorigin="anonymous"></script>
     <script src="scripts/navBarScript.js"></script>
     <script src="scripts/configScript.js"></script>
     <script src="scripts/userConfigScript.js"></script>

@@ -9,19 +9,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import pl.smartweather.app.exception.BadParametersRequestException;
+import pl.smartweather.app.exception.ExternalException;
 import pl.smartweather.app.exception.NoMatchFoundException;
 import pl.smartweather.app.entity.ForecastInformation;
 import pl.smartweather.app.entity.Weather;
 import pl.smartweather.app.entity.WeatherInformation;
 import pl.smartweather.app.repository.WeatherRepository;
-import pl.smartweather.app.utils.TestUtils;
+import pl.smartweather.app.util.TestUtils;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -52,6 +55,9 @@ public class WeatherServiceTest {
 
     @Autowired
     private WeatherService weatherService;
+
+    @MockitoBean
+    private ConfigService configService;
 
     @BeforeAll
     public static void setUpWireMockServer() {
@@ -110,7 +116,7 @@ public class WeatherServiceTest {
     void saveWeatherRecordThrowsBadParametersRequestExceptionStatus() {
         stubFor(get(urlPathEqualTo("/forecast.json"))
                 .willReturn(serverError()));
-        assertThrows(BadParametersRequestException.class, () -> weatherService.saveWeatherRecord("TestLocation"));
+        assertThrows(ExternalException.class, () -> weatherService.saveWeatherRecord("TestLocation"));
     }
 
     @Test
@@ -137,19 +143,19 @@ public class WeatherServiceTest {
     @Test
     void findRecordByLocationAndDateShouldReturnNull() {
         String location = "TestLocation-NotExists";
-        String date = "1999-99-99";
+        LocalDate date = LocalDate.of(1999,12,12);
         assertNull(weatherService.findWeatherByLocationAndDate(location, date), "Should not find any record");
     }
 
 
     private Weather createTestWeather() {
         WeatherInformation information = new WeatherInformation(
-                "00:00", 10, 10, 10, 10, 1000, 10, 0);
+                LocalTime.of(0,0), 10, 10, 10, 10, 1000, 10, 0);
         ForecastInformation forecastInformation = new ForecastInformation(
-                "05:00", "19:00", 10, List.of(information));
+                LocalTime.of(5,49), LocalTime.of(19,0), 10, List.of(information));
         Weather testWeather = Weather.builder()
                 .location("London")
-                .date("2025-04-08")
+                .date(LocalDate.of(2025, 4,25))
                 .weatherInformation(information)
                 .forecastInformation(List.of(forecastInformation)).build();
         weatherRepository.save(testWeather);

@@ -7,6 +7,7 @@ $(document).ready(function () {
     $("#addUserForm").click(function (e) {
         e.preventDefault();
         $("#addUserModal").modal('show');
+        $("#errorMessage").hide().text("");
 
         $("#addUser").submit(function (e) {
             e.preventDefault();

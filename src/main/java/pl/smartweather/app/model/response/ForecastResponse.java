@@ -2,8 +2,12 @@ package pl.smartweather.app.model.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
+import pl.smartweather.app.util.AmPmToLocalTimeDeserializer;
+import pl.smartweather.app.util.LocalTimeDeserializer;
 
+import java.time.LocalTime;
 import java.util.List;
 
 @Getter
@@ -34,15 +38,19 @@ public class ForecastResponse {
     @Getter
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Astro {
-        private String sunrise;
-        private String sunset;
+        @JsonDeserialize(using = AmPmToLocalTimeDeserializer.class)
+        private LocalTime sunrise;
+
+        @JsonDeserialize(using = AmPmToLocalTimeDeserializer.class)
+        private LocalTime sunset;
     }
 
     @Getter
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class HourlyForecast {
 
-        private String time;
+        @JsonDeserialize(using = LocalTimeDeserializer.class)
+        private LocalTime time;
 
         @JsonProperty("temp_c")
         private double temperature;

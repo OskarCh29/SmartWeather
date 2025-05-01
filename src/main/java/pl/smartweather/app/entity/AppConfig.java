@@ -19,5 +19,7 @@ public class AppConfig {
 
     private boolean initialized;
 
+    private String location;
+
     private Map<String, String> config;
 }

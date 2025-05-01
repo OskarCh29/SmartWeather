@@ -4,8 +4,8 @@ spring:
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
+    username: oskartestowy1@gmail.com
+    password: rluo dfld zuev lpij
     protocol: smtp
     properties:
       mail.smtp.auth: true
@@ -14,6 +14,7 @@ weather:
   url: http://api.weatherapi.com/v1
 security:
   API_KEY: "testApiKey"
+  salt: "GH$LS1$#ghGEOUIY#12sdgsdhSD46hgO"
 userData:
   location: TestLocation
   userEmail: test@example.com

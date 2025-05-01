@@ -2,19 +2,24 @@ package pl.smartweather.app.service;
 
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+import pl.smartweather.app.entity.AppConfig;
 import pl.smartweather.app.entity.ForecastInformation;
 import pl.smartweather.app.entity.Weather;
 import pl.smartweather.app.entity.WeatherInformation;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,7 +31,7 @@ import static org.mockito.Mockito.*;
 @SpringBootTest(classes = EmailService.class)
 public class EmailServiceTest {
     @MockitoBean
-    private JavaMailSender sender;
+    private JavaMailSenderImpl sender;
 
     @MockitoBean
     private TemplateEngine templateEngine;
@@ -36,6 +41,14 @@ public class EmailServiceTest {
 
     @Autowired
     private EmailService emailService;
+
+    @MockitoBean
+    private ConfigService configService;
+
+    @BeforeEach
+    void setup() {
+        when(configService.getAppConfig()).thenReturn(createTestConfig());
+    }
 
     @Test
     void shouldBuildAndSendWeatherReportEmail() throws Exception {
@@ -81,14 +94,21 @@ public class EmailServiceTest {
 
     private Weather createTestWeather() {
         WeatherInformation information = new WeatherInformation(
-                "00:00", 10, 10, 10, 10, 1000, 10, 0);
+                LocalTime.of(0,0), 10, 10, 10, 10, 1000, 10, 0);
         ForecastInformation forecastInformation = new ForecastInformation(
-                "05:00", "19:00", 10, List.of(information));
+                LocalTime.of(5,49), LocalTime.of(19,0), 10, List.of(information));
         return Weather.builder()
                 .location("testLocation")
-                .date("2025-04-08")
+                .date(LocalDate.of(2025, 4,25))
                 .weatherInformation(information)
                 .forecastInformation(List.of(forecastInformation)).build();
+    }
+    private AppConfig createTestConfig(){
+        AppConfig config = new AppConfig();
+        config.setLocation("London");
+        config.setInitialized(true);
+        config.setConfig(new HashMap<String,String>());
+        return config;
     }
 }
 

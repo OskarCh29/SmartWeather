@@ -1,14 +1,22 @@
 package pl.smartweather.app.service;
 
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 import pl.smartweather.app.entity.AppConfig;
+import pl.smartweather.app.exception.ApiAuthorizationException;
 import pl.smartweather.app.exception.ConfigurationException;
+import pl.smartweather.app.exception.ExternalException;
+import pl.smartweather.app.exception.NoMatchFoundException;
+import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,8 +24,8 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AppConfigService {
-
+public class ConfigService {
+    private final WebClient webClient;
     private final MongoTemplate mongoTemplate;
     private final CryptoService cryptoService;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -25,6 +33,7 @@ public class AppConfigService {
     @Value("${security.salt}")
     private String salt;
 
+    @Getter
     private AppConfig appConfig;
 
     @PostConstruct
@@ -89,4 +98,60 @@ public class AppConfigService {
         }
     }
 
+    public void validateApiKey(String apiKey) {
+        webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/current.json")
+                        .queryParam("key", apiKey)
+                        .queryParam("q", "Warsaw")
+                        .queryParam("aqi", false)
+                        .build())
+                .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
+                        Mono.error(new ExternalException("API encountered error - check your request")))
+                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
+                    if (clientResponse.statusCode() == HttpStatus.FORBIDDEN) {
+                        return Mono.error(new ApiAuthorizationException("API key is invalid - check configuration"));
+                    }
+                    return Mono.error(new NoMatchFoundException("No match found on location provided"));
+                }).bodyToMono(String.class)
+                .block();
+    }
+
+    private Mono<Boolean> checkIfLocationExists(String location) {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("current.json")
+                        .queryParam("key", getApiKey())
+                        .queryParam("q", location)
+                        .queryParam("aqi", false)
+                        .build())
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, response ->
+                        Mono.error(new NoMatchFoundException("Invalid location")))
+                .toBodilessEntity().map(resp -> true);
+    }
+
+    public String getApiKey() {
+        if (appConfig.isInitialized()) {
+            return cryptoService.decrypt(appConfig.getConfig().get("api_key"));
+        } else {
+            throw new ConfigurationException("Api key not provided");
+        }
+    }
+
+    public String getLocation() {
+        if (!appConfig.isInitialized() || appConfig.getLocation() == null) {
+            throw new ConfigurationException("Location not provided");
+        } else {
+            return appConfig.getLocation();
+        }
+    }
+
+    public void setLocationConfiguration(String location) {
+        checkIfLocationExists(location).block();
+        appConfig.setLocation(location);
+        mongoTemplate.save(appConfig);
+    }
 }
+

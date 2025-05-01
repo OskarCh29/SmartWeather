@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import pl.smartweather.app.entity.Weather;
-import pl.smartweather.app.service.AppConfigService;
+import pl.smartweather.app.service.ConfigService;
 import pl.smartweather.app.service.EmailService;
 import pl.smartweather.app.service.WeatherService;
 
@@ -21,10 +21,7 @@ import java.time.format.DateTimeFormatter;
 public class DailyForecastScheduler {
     private final WeatherService weatherService;
     private final EmailService emailService;
-    private final AppConfigService appConfigService;
-
-    @Value("${userData.location}")
-    private String location;
+    private final ConfigService configService;
 
     @Value("${userData.userEmail}")
     private String userEmail;
@@ -35,13 +32,13 @@ public class DailyForecastScheduler {
     @Scheduled(cron = "0 0 8 * * *")
     public void sendInfoMail() {
         try {
-//            if(!appConfigService.isInitialized()){
-//                log.warn("Application not configured. Skipping sending daily forecast");
-//                return;
-//            }
-            String today = DateTimeFormatter.ISO_DATE.format(LocalDate.now());
-            weatherService.saveWeatherRecord(location);
-            Weather weather = weatherService.findWeatherByLocationAndDate(location, today);
+            if (!configService.getAppConfig().isInitialized() || configService.getLocation() == null) {
+                log.warn("Application not configured. Skipping sending daily forecast");
+                return;
+            }
+            LocalDate today = LocalDate.now();
+            weatherService.saveWeatherRecord(configService.getLocation());
+            Weather weather = weatherService.findWeatherByLocationAndDate(configService.getLocation(), today);
             emailService.sendWeatherToUser(userEmail, weather);
             emailService.sendWeatherToUser(secondUserEmail, weather);
 

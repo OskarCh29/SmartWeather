@@ -1,4 +1,4 @@
-package pl.smartweather.app.utils;
+package pl.smartweather.app.util;
 
 import org.testcontainers.shaded.org.apache.commons.io.FileUtils;
 

@@ -6,9 +6,10 @@ $(document).ready(function () {
         success: function (response) {
             console.log(response)
             // Load basic information
+            $("#location").removeClass("text-danger").addClass("text-info");
             document.getElementById('location').textContent = response.location + " " + changeDateFormat(response.date)
-            document.getElementById('sunrise').textContent = to24HourFormat(response.forecastInformation[0].sunrise);
-            document.getElementById('sunset').textContent = to24HourFormat(response.forecastInformation[0].sunset);
+            document.getElementById('sunrise').textContent = response.forecastInformation[0].sunrise;
+            document.getElementById('sunset').textContent = response.forecastInformation[0].sunset;
 
             // Setup the current weather page
             document.getElementById('temp-value').textContent = response.weatherInformation.temperature + " °C";
@@ -23,6 +24,8 @@ $(document).ready(function () {
             updateWeatherIcon(response);
         },error: function(error){
             console.error('Error while loading weather data:' , error);
+            document.getElementById('location').textContent = "Application not configured - check config"
+            $("#location").removeClass("text-info").addClass("text-danger");
         }
     });
 });
@@ -110,22 +113,7 @@ function getCurrentTime() {
     const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
     document.getElementById('time').textContent = timeNow;
 }
-function to24HourFormat(time12h) {
-    const [time, modifier] = time12h.split(' ');
 
-    let [hour, minutes] = time.split(":");
-
-    hour = parseInt(hour, 10);
-
-    if (modifier == 'PM' && hour !== 12) {
-        hour += 12;
-    }
-    if (modifier == 'AM' && hour == 12) {
-        hour = 0;
-    }
-    return `${hour.toString().padStart(2, '0')}:${minutes}`;
-
-}
 function updateWeatherIcon(response) {
     const weatherIcons = [
         {

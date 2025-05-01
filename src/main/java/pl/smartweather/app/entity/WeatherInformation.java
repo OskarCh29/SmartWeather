@@ -1,10 +1,16 @@
 package pl.smartweather.app.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pl.smartweather.app.model.response.WeatherResponse;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 @Getter
 @Setter
@@ -13,7 +19,7 @@ import pl.smartweather.app.model.response.WeatherResponse;
 public class WeatherInformation {
 
     public WeatherInformation(WeatherResponse response) {
-        this.hour = response.getCurrentWeather().getLastUpdate();
+        this.hour = LocalTime.now();
         this.temperature = response.getCurrentWeather().getTemperature();
         this.feelsLike = response.getCurrentWeather().getFeelsLike();
         this.windSpeed = response.getCurrentWeather().getWindSpeed();
@@ -21,7 +27,8 @@ public class WeatherInformation {
         this.pressure = response.getCurrentWeather().getPressure();
         this.humidity = response.getCurrentWeather().getHumidity();
     }
-    private String hour;
+    @JsonFormat(pattern = "HH:mm")
+    private LocalTime hour;
 
     private double temperature;
 

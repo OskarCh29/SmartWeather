@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import pl.smartweather.app.entity.WeatherInformation;
 
 import java.io.IOException;
+import java.time.LocalTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -20,8 +21,8 @@ public class ChartServiceTest {
     @Test
     void shouldGenerateTemperatureChartImage() throws IOException {
         List<WeatherInformation> forecast = List.of(
-                new WeatherInformation("00:00", 10.0, 12.0, 30.0, 80, 1010, 60, 10),
-                new WeatherInformation("01:00", 11.0, 13.0, 25.0, 77, 1010, 55, 10)
+                new WeatherInformation(LocalTime.of(0, 0), 10.0, 12.0, 30.0, 80, 1010, 60, 10),
+                new WeatherInformation(LocalTime.of(1, 0), 11.0, 13.0, 25.0, 77, 1010, 55, 10)
         );
         byte[] result = chartService.generateTemperatureChart(forecast);
 
@@ -32,8 +33,8 @@ public class ChartServiceTest {
     @Test
     void shouldGenerateRainChartImage() throws IOException {
         List<WeatherInformation> forecast = List.of(
-                new WeatherInformation("00:00", 10.0, 12.0, 30.0, 80, 1010, 60, 10),
-                new WeatherInformation("01:00", 11.0, 13.0, 25.0, 77, 1010, 55, 10)
+                new WeatherInformation(LocalTime.of(0, 0), 10.0, 12.0, 30.0, 80, 1010, 60, 10),
+                new WeatherInformation(LocalTime.of(1, 0), 11.0, 13.0, 25.0, 77, 1010, 55, 10)
         );
         byte[] result = chartService.generateRainChart(forecast);
 
