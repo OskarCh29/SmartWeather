@@ -11,7 +11,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 @Getter
-public class ForecastResponse {
+public class ForecastApiResponse {
 
     @JsonProperty("forecastday")
     private List<DayForecast> dayForecast;

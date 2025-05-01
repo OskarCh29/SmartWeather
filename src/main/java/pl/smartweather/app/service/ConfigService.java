@@ -16,6 +16,7 @@ import pl.smartweather.app.exception.ApiAuthorizationException;
 import pl.smartweather.app.exception.ConfigurationException;
 import pl.smartweather.app.exception.ExternalException;
 import pl.smartweather.app.exception.NoMatchFoundException;
+import pl.smartweather.app.model.response.ApiLocationResponse;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
@@ -28,6 +29,7 @@ public class ConfigService {
     private final WebClient webClient;
     private final MongoTemplate mongoTemplate;
     private final CryptoService cryptoService;
+    private final TokenService tokenService;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Value("${security.salt}")
@@ -92,9 +94,11 @@ public class ConfigService {
         }
     }
 
-    public void validateRootPassword(String rootPassword) {
+    public String validateRootPassword(String rootPassword) {
         if (!passwordEncoder.matches(salt + rootPassword, appConfig.getRootPassword())) {
             throw new SecurityException("Invalid password");
+        } else {
+            return tokenService.generateToken();
         }
     }
 
@@ -118,20 +122,6 @@ public class ConfigService {
                 .block();
     }
 
-    private Mono<Boolean> checkIfLocationExists(String location) {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("current.json")
-                        .queryParam("key", getApiKey())
-                        .queryParam("q", location)
-                        .queryParam("aqi", false)
-                        .build())
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, response ->
-                        Mono.error(new NoMatchFoundException("Invalid location")))
-                .toBodilessEntity().map(resp -> true);
-    }
-
     public String getApiKey() {
         if (appConfig.isInitialized()) {
             return cryptoService.decrypt(appConfig.getConfig().get("api_key"));
@@ -149,9 +139,27 @@ public class ConfigService {
     }
 
     public void setLocationConfiguration(String location) {
-        checkIfLocationExists(location).block();
-        appConfig.setLocation(location);
+        ApiLocationResponse locationResponse = checkIfLocationExists(location);
+        appConfig.setLocation(locationResponse.getLocation().getName());
         mongoTemplate.save(appConfig);
+    }
+
+    private ApiLocationResponse checkIfLocationExists(String location) {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/current.json")
+                        .queryParam("key", getApiKey())
+                        .queryParam("q", location)
+                        .queryParam("aqi", false)
+                        .build())
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
+                    if (clientResponse.statusCode() == HttpStatus.BAD_REQUEST) {
+                        return Mono.error(new NoMatchFoundException("Provided location not found"));
+                    }
+                    return Mono.error(new ConfigurationException("Missing information or authorized"));
+                }).bodyToMono(ApiLocationResponse.class)
+                .block();
     }
 }
 

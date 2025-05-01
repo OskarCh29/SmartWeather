@@ -5,12 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import pl.smartweather.app.model.response.WeatherResponse;
+import pl.smartweather.app.model.response.WeatherApiResponse;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 @Getter
 @Setter
@@ -18,7 +15,7 @@ import java.time.format.DateTimeFormatter;
 @NoArgsConstructor
 public class WeatherInformation {
 
-    public WeatherInformation(WeatherResponse response) {
+    public WeatherInformation(WeatherApiResponse response) {
         this.hour = LocalTime.now();
         this.temperature = response.getCurrentWeather().getTemperature();
         this.feelsLike = response.getCurrentWeather().getFeelsLike();

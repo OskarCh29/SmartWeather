@@ -27,9 +27,4 @@ public class WeatherPageController {
                 configService.getLocation(), today);
         return ResponseEntity.ok(weather);
     }
-    @GetMapping("/apiTest")
-    public ResponseEntity<Weather> test(){
-        Weather weather = weatherService.findWeatherByLocationAndDate("Hajnowka",LocalDate.of(2025,5,1));
-        return ResponseEntity.ok(weather);
-    }
 }

@@ -1,6 +1,7 @@
 package pl.smartweather.app.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import pl.smartweather.app.entity.User;
 import pl.smartweather.app.exception.UserAlreadyExistsException;
@@ -21,12 +22,12 @@ public class UserService {
     }
 
     public User saveNewUser(User user) {
-        if (userRepository.findByEmailAddress(user.getEmailAddress()).isPresent()) {
-            throw new UserAlreadyExistsException("Email already in use");
-        } else {
+        try {
             return userRepository.save(user);
-        }
 
+        } catch (DuplicateKeyException e) {
+            throw new UserAlreadyExistsException("Email already in use");
+        }
     }
 
     public void deleteUser(User user) {

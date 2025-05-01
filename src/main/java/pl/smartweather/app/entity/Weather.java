@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @Document(collection = "weather")
-@CompoundIndex(name = "location_date_unique", def = "{'location' : 1, 'date' : -1}")
+@CompoundIndex(name = "location_date_unique", def = "{'location' : 1, 'date' : -1}" ,unique = true)
 public class Weather {
 
     @Id

@@ -14,8 +14,10 @@ import pl.smartweather.app.model.request.ConfigUpdateRequest;
 import pl.smartweather.app.model.request.LocationRequest;
 import pl.smartweather.app.model.request.RootPasswordRequest;
 import pl.smartweather.app.model.response.GenericServerResponse;
+import pl.smartweather.app.model.response.TokenResponse;
 import pl.smartweather.app.service.ConfigService;
 import pl.smartweather.app.service.EmailService;
+import pl.smartweather.app.service.TokenService;
 
 @Slf4j
 @RestController
@@ -23,6 +25,7 @@ import pl.smartweather.app.service.EmailService;
 public class ConfigurationController {
     private final ConfigService configService;
     private final EmailService emailService;
+    private final TokenService tokenService;
 
     @GetMapping("/config")
     public ResponseEntity<AppConfig> checkConfigStatus() {
@@ -31,10 +34,10 @@ public class ConfigurationController {
     }
 
     @PostMapping("/config/validate")
-    public ResponseEntity<GenericServerResponse> validateRootPassword(
+    public ResponseEntity<TokenResponse> validateRootPassword(
             @RequestBody @Valid RootPasswordRequest rootRequest) {
-        configService.validateRootPassword(rootRequest.getRootPassword());
-        return ResponseEntity.ok(new GenericServerResponse("Root validated"));
+        String token =configService.validateRootPassword(rootRequest.getRootPassword());
+        return ResponseEntity.ok(new TokenResponse(token));
     }
 
     @PostMapping("/config/root")
@@ -54,6 +57,7 @@ public class ConfigurationController {
             @RequestBody @Valid ConfigUpdateRequest configRequest) {
         emailService.validateEmailConfiguration(configRequest.getNewConfig());
         configService.validateApiKey(configRequest.getNewConfig().get("api_key"));
+        tokenService.validateToken(configRequest.getToken());
         configService.setupAppConfiguration(configRequest.getNewConfig());
         return ResponseEntity.status(HttpStatus.CREATED).body(new GenericServerResponse("Configuration provided"));
     }

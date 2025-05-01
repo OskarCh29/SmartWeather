@@ -9,7 +9,7 @@ import pl.smartweather.app.util.LocalDateDeserializer;
 import java.time.LocalDate;
 
 @Getter
-public class WeatherResponse {
+public class WeatherApiResponse {
 
     private Location location;
 
@@ -17,7 +17,7 @@ public class WeatherResponse {
     private CurrentWeather currentWeather;
 
     @JsonProperty("forecast")
-    private ForecastResponse forecast;
+    private ForecastApiResponse forecast;
 
     @Getter
     public static class Location {

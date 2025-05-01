@@ -108,8 +108,9 @@ function checkPassword() {
 
 };
 // Send root password to server - Validation
+let rootAuthToken = null;
 function validateRootPassword(password) {
-    const rootPass = {
+    let rootPass = {
         rootPassword: password
     }
     $.ajax({
@@ -117,13 +118,15 @@ function validateRootPassword(password) {
         url: "http://localhost:8080/config/validate",
         data: JSON.stringify(rootPass),
         contentType: "application/json",
-        success: function () {
+        success: function (response) {
+            rootAuthToken = response.userToken;
+            unlockSettings();
             $("#wrongPassword").hide();
             $("#passwordConfig").modal('hide');
-            unlockSettings();
+
 
         }, error: function (xhr) {
-            if (xhr.responseText.includes("Password not valid - Check Requirements")) {
+            if (xhr.status == 401 || xhr.responseText.includes("Password not valid - Check Requirements")) {
                 $("#wrongPassword").text("Password incorrect").show();
             }
         }
@@ -142,6 +145,7 @@ function unlockSettings() {
 
 // Lock the root settings + SAVE
 function lockSettings() {
+    console.log(rootAuthToken);
     $("#unlockSettings").prop("disabled", true)
     const configuration = {
         newConfig: {
@@ -150,8 +154,9 @@ function lockSettings() {
             "mail_name": $("#mailName").val(),
             "mail_pass": $("#mailPassword").val(),
             "api_key": $("#apiKey").val()
-        }
-    }
+        },
+        token: rootAuthToken
+    };
 
     $.ajax({
         type: "POST",
@@ -214,9 +219,14 @@ function lockLocation() {
                 .text("🔒");
             $("#locationInput").prop("disabled", true);
             locationUnlocked = false;
-            $("#location-status").hide();
-        }, error() {
-            $("#location-status").text("Location not found").show(); 
+            $("#location-status").text("").hide();
+        }, error(xhr) {
+            if (xhr.responseText.includes("Api key not provided")) {
+                $("#location-status").text("Authorization error: Cannot check location - API Key missing");
+                $("#location-status").show();
+            } else {
+                $("#location-status").text("Location not found").show();
+            }
         },
         complete: function () {
             $("#unlockLocation").prop("disabled", false);
