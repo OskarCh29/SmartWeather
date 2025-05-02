@@ -8,6 +8,7 @@ import lombok.Setter;
 import pl.smartweather.app.model.response.WeatherApiResponse;
 
 import java.time.LocalTime;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -24,6 +25,7 @@ public class WeatherInformation {
         this.pressure = response.getCurrentWeather().getPressure();
         this.humidity = response.getCurrentWeather().getHumidity();
     }
+
     @JsonFormat(pattern = "HH:mm")
     private LocalTime hour;
 
@@ -40,4 +42,25 @@ public class WeatherInformation {
     private int humidity;
 
     private int chanceOfRain;
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        WeatherInformation that = (WeatherInformation) o;
+        return Double.compare(temperature, that.temperature) == 0
+                && Double.compare(feelsLike, that.feelsLike) == 0
+                && Double.compare(windSpeed, that.windSpeed) == 0
+                && cloud == that.cloud
+                && pressure == that.pressure
+                && humidity == that.humidity
+                && chanceOfRain == that.chanceOfRain
+                && Objects.equals(hour, that.hour);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(hour, temperature, feelsLike, windSpeed, cloud, pressure, humidity, chanceOfRain);
+    }
 }

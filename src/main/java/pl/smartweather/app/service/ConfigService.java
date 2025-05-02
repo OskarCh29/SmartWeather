@@ -39,7 +39,7 @@ public class ConfigService {
     private AppConfig appConfig;
 
     @PostConstruct
-    public void init() {
+    private void init() {
         this.appConfig = mongoTemplate.findById("app_config", AppConfig.class);
         if (appConfig == null) {
             appConfig = new AppConfig();
@@ -50,10 +50,10 @@ public class ConfigService {
 
     public void checkConfigStatus() {
         if (!appConfig.isInitialized() && appConfig.getRootPassword() == null) {
-            throw new ConfigurationException("Application settings not configured");
+            throw new ConfigurationException("First configuration not provided");
         }
         if (appConfig.getConfig() == null) {
-            throw new ConfigurationException("First configuration not provided yet");
+            throw new ConfigurationException("Admin need to provide proper configuration");
         }
     }
 

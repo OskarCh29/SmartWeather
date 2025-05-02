@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.smartweather.app.entity.User;
+import pl.smartweather.app.model.request.UserRequest;
 import pl.smartweather.app.model.response.GenericServerResponse;
 import pl.smartweather.app.service.UserService;
 
@@ -27,13 +28,16 @@ public class UserController {
     }
 
     @PostMapping("/user")
-    public ResponseEntity<User> saveUser(@RequestBody(required = true) @Valid User user) {
+    public ResponseEntity<User> saveUser(@RequestBody(required = true) @Valid UserRequest userRequest) {
+        User user = User.builder().emailAddress(userRequest.getEmailAddress()).build();
         userService.saveNewUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
     @DeleteMapping("/user")
-    public ResponseEntity<GenericServerResponse> deleteUser(@RequestBody(required = true) @Valid User user) {
+    public ResponseEntity<GenericServerResponse> deleteUser(
+            @RequestBody(required = true) @Valid UserRequest userRequest) {
+        User user = User.builder().emailAddress(userRequest.getEmailAddress()).build();
         userService.deleteUser(user);
         return ResponseEntity.ok(new GenericServerResponse("User: " + user.getEmailAddress() + " has been deleted"));
     }

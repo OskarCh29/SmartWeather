@@ -6,7 +6,6 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import pl.smartweather.app.security.EmailGuard;
 
 @Getter
 @Setter
@@ -17,6 +16,5 @@ public class User {
     private String id;
 
     @Indexed(unique = true)
-    @EmailGuard("Please enter a valid email")
     private String emailAddress;
 }

@@ -2,7 +2,6 @@ package pl.smartweather.app.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
@@ -20,6 +19,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -32,15 +32,21 @@ public class WeatherService {
 
     public void saveWeatherRecord(String location) {
         Weather weather = getCurrentWeather(location).block();
-        try {
+        Optional<Weather> existingRecordOpt = findWeatherByLocationAndDate(weather.getLocation(), weather.getDate());
+        if (existingRecordOpt.isEmpty()) {
             weatherRepository.save(weather);
-        } catch (DuplicateKeyException e) {
-            log.info("Record already exists for {} on {}", weather.getLocation(), weather.getDate());
+        } else {
+            Weather existingRecord = existingRecordOpt.get();
+            if (!weather.getWeatherInformation().equals(existingRecord.getWeatherInformation())) {
+                existingRecord.setWeatherInformation(weather.getWeatherInformation());
+                log.info("{} - current weather updated", weather.getLocation());
+                weatherRepository.save(existingRecord);
+            }
         }
     }
 
-    public Weather findWeatherByLocationAndDate(String location, LocalDate date) {
-        return weatherRepository.findByLocationAndDate(location, date).orElse(null);
+    public Optional<Weather> findWeatherByLocationAndDate(String location, LocalDate date) {
+        return weatherRepository.findByLocationAndDate(location, date);
     }
 
     private Mono<Weather> getCurrentWeather(String location) {

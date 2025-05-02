@@ -14,7 +14,7 @@ public class ApiLocationResponse {
     @Getter
     @Setter
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class Location{
+    public static class Location {
         private String name;
     }
 }

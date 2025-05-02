@@ -20,8 +20,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleUserAlreadyExistsException(UserAlreadyExistsException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
+
     @ExceptionHandler(NoMatchFoundException.class)
-    public ResponseEntity<Object> handleNoMatchException(NoMatchFoundException e){
+    public ResponseEntity<Object> handleNoMatchException(NoMatchFoundException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
@@ -49,5 +50,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ApiAuthorizationException.class)
     public ResponseEntity<Object> handleApiAuthorizationException(ApiAuthorizationException e) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+    }
+
+    @ExceptionHandler(ExternalException.class)
+    public ResponseEntity<Object> handleExternalException(ExternalException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 }

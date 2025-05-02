@@ -10,23 +10,25 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class TokenService {
+    private static final int EXPIRY_TIME_MINUTES = 5;
     private final Map<String, Instant> validTokens = new ConcurrentHashMap<>();
 
     public String generateToken() {
         String token = UUID.randomUUID().toString();
-        validTokens.put(token, Instant.now().plus(Duration.ofMinutes(5)));
+        validTokens.put(token, Instant.now().plus(Duration.ofMinutes(EXPIRY_TIME_MINUTES)));
         return token;
     }
+
     public void validateToken(String token) {
         Instant expiry = validTokens.get(token);
-        if(expiry != null && Instant.now().isBefore(expiry)){
+        if (expiry != null && Instant.now().isBefore(expiry)) {
             invalidateToken(token);
-        }
-        else{
+        } else {
             throw new SecurityException("Token for request is invalid");
         }
     }
-    private void invalidateToken(String token){
+
+    private void invalidateToken(String token) {
         validTokens.remove(token);
     }
 }

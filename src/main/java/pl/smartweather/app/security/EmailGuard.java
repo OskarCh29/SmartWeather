@@ -11,8 +11,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EmailGuard {
 
-    String value();
-
     String message() default "Invalid email address";
 
     Class<?>[] groups() default {};

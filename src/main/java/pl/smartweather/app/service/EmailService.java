@@ -66,11 +66,16 @@ public class EmailService {
     }
 
     public void sendErrorNotification(String userEmail, String subject, String notification) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(userEmail);
-        message.setSubject(subject);
-        message.setText(notification);
-        mailSender.send(message);
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(userEmail);
+            message.setSubject(subject);
+            message.setText(notification);
+            mailSender.send(message);
+        } catch (Exception e) {
+            log.error("Check mail configuration - Authorization exception");
+        }
+
     }
 
     public void validateEmailConfiguration(Map<String, String> emailConfig) {

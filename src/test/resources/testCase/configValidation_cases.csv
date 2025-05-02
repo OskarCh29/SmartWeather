@@ -1,0 +1,9 @@
+testHost,NonNumericPort,testMail,testPassword,testAPI,mail_port must be a number
+testHost,-1,testMail,testPassword,testAPI,Invalid mail_port value
+testHost,100000,testMail,testPassword,testApi,Invalid mail_port value
+testHost,      ,testMail,testPassword,testApi,Configuration missing: mail_port
+,,,,,Configuration missing
+testHost,587,,testPassword,testApi, Configuration missing: mail_name
+testHost,25, ,testPassword,testApi,Configuration missing: mail_name
+testHost,25,"",testPassword,testApi,Configuration missing: mail_name
+testHost,"",testMail,testPassword,testApi,Configuration missing: mail_port

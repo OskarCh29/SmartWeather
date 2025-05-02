@@ -11,7 +11,7 @@ security:
   salt: "GH$LS1$#ghGEOUIY#12sdgsdhSD46hgO"
 userData:
   location: Bialystok
-  userEmail: testMail@gmail.com
+  userEmail: oskar.charytoniuk@tlen.pl
   secondUserEmail: subMail@gmail.com
 server:
   port: 8080

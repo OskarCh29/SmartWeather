@@ -13,7 +13,6 @@ import pl.smartweather.app.service.WeatherService;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 @Slf4j
 @Component
@@ -38,9 +37,10 @@ public class DailyForecastScheduler {
             }
             LocalDate today = LocalDate.now();
             weatherService.saveWeatherRecord(configService.getLocation());
-            Weather weather = weatherService.findWeatherByLocationAndDate(configService.getLocation(), today);
+            Weather weather = weatherService.findWeatherByLocationAndDate(configService.getLocation(), today).get();
             emailService.sendWeatherToUser(userEmail, weather);
             emailService.sendWeatherToUser(secondUserEmail, weather);
+            log.info("Weather report sent - " + configService.getLocation() + " , " + today);
 
         } catch (MessagingException e) {
             log.error("Failed to send weather email - Check email parameters");

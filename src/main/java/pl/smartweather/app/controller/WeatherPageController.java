@@ -9,8 +9,7 @@ import pl.smartweather.app.service.ConfigService;
 import pl.smartweather.app.service.WeatherService;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,8 +22,8 @@ public class WeatherPageController {
     public ResponseEntity<Weather> welcomePage() {
         LocalDate today = LocalDate.now();
         weatherService.saveWeatherRecord(configService.getLocation());
-        Weather weather = weatherService.findWeatherByLocationAndDate(
+        Optional<Weather> weather = weatherService.findWeatherByLocationAndDate(
                 configService.getLocation(), today);
-        return ResponseEntity.ok(weather);
+        return ResponseEntity.ok(weather.get());
     }
 }

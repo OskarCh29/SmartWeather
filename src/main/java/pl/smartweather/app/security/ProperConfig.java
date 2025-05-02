@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = ProperConfigConstraintValidator.class)
 public @interface ProperConfig {
 
-    String message() default "Password invalid - no requirements met";
+    String message() default "Configuration invalid";
 
     Class<?>[] groups() default {};
 

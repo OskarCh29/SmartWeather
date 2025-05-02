@@ -36,7 +36,7 @@ public class ConfigurationController {
     @PostMapping("/config/validate")
     public ResponseEntity<TokenResponse> validateRootPassword(
             @RequestBody @Valid RootPasswordRequest rootRequest) {
-        String token =configService.validateRootPassword(rootRequest.getRootPassword());
+        String token = configService.validateRootPassword(rootRequest.getRootPassword());
         return ResponseEntity.ok(new TokenResponse(token));
     }
 
@@ -46,14 +46,14 @@ public class ConfigurationController {
         return ResponseEntity.ok(new GenericServerResponse("Root password updated"));
     }
 
-    @PostMapping("config/location")
+    @PostMapping("/config/location")
     public ResponseEntity<GenericServerResponse> setAppLocation(@RequestBody @Valid LocationRequest locationRequest) {
         configService.setLocationConfiguration(locationRequest.getLocation());
         return ResponseEntity.ok(new GenericServerResponse("Location updated to: " + locationRequest.getLocation()));
     }
 
     @PostMapping("/config")
-    public ResponseEntity<GenericServerResponse> setupConfiguration(
+    public ResponseEntity<GenericServerResponse> updateConfiguration(
             @RequestBody @Valid ConfigUpdateRequest configRequest) {
         emailService.validateEmailConfiguration(configRequest.getNewConfig());
         configService.validateApiKey(configRequest.getNewConfig().get("api_key"));
