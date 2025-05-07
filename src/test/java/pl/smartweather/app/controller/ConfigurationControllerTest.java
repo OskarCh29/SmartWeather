@@ -212,35 +212,35 @@ public class ConfigurationControllerTest {
         doNothing().when(emailService).validateEmailConfiguration(any());
         doNothing().when(configService).validateApiKey(any());
         doNothing().when(tokenService).validateToken(any());
-        doNothing().when(configService).setupAppConfiguration(any());
+        doNothing().when(configService).setupAppConfiguration(any(),any());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/config")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(request)))
+                        .content(new ObjectMapper().writeValueAsString(request))
+                        .header("Authorization", "ValidToken"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.message").value("Configuration provided"));
 
         verify(emailService).validateEmailConfiguration(any());
         verify(configService).validateApiKey(any());
         verify(tokenService).validateToken(any());
-        verify(configService).setupAppConfiguration(any());
+        verify(configService).setupAppConfiguration(any(),anyString());
     }
 
     @Test
-    void updateConfigurationShouldReturn400causedByValidationTokenMissing() throws Exception {
+    void updateConfigurationShouldReturn400causedByTokenHeaderMissing() throws Exception {
         ConfigUpdateRequest request = getTestRequest();
-        request.setToken("");
         mockMvc.perform(MockMvcRequestBuilders.post("/config")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Authorization token missing")));
+                .andExpect(content().string(containsString(
+                        "Required request header 'Authorization' for method parameter type String is not present")));
     }
     @Test
     void updateConfigurationShouldReturn400causedByValidationConfigMissing() throws Exception {
         ConfigUpdateRequest request = new ConfigUpdateRequest();
-        request.setToken("validToken");
-
+        request.setRootEmail("root@example.com");
         mockMvc.perform(MockMvcRequestBuilders.post("/config")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(request)))
@@ -252,7 +252,6 @@ public class ConfigurationControllerTest {
     void updateConfigurationShouldReturn400causedByValidationConfigInvalid(
             String host, String port, String mailName, String mailPass, String apiKey, String mess) throws Exception {
         ConfigUpdateRequest request = new ConfigUpdateRequest();
-        request.setToken("validToken");
         Map<String,String> newConfig = new HashMap<>();
         newConfig.put("mail_host",host);
         newConfig.put("mail_port", port);
@@ -260,6 +259,7 @@ public class ConfigurationControllerTest {
         newConfig.put("mail_pass",mailPass);
         newConfig.put("api_key",apiKey);
         request.setNewConfig(newConfig);
+        request.setRootEmail("root@example.com");
 
         mockMvc.perform(MockMvcRequestBuilders.post("/config")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -277,7 +277,8 @@ public class ConfigurationControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/config")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(request)))
+                        .content(new ObjectMapper().writeValueAsString(request))
+                        .header("Authorization", "ValidToken"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string(containsString("Unauthorized access to email")));
 
@@ -293,7 +294,8 @@ public class ConfigurationControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/config")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(request)))
+                        .content(new ObjectMapper().writeValueAsString(request))
+                        .header("Authorization","Valid Token"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string(containsString("Unauthorized access to API - invalid key")));
 
@@ -309,17 +311,29 @@ public class ConfigurationControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/config")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(request)))
+                        .content(new ObjectMapper().writeValueAsString(request))
+                        .header("Authorization", "Invalid token"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string(containsString("Token for request is invalid")));
 
         verify(tokenService).validateToken(any());
     }
+    @Test
+    void updateConfigurationShouldReturn400causedByRootEmailValidation() throws Exception{
+        ConfigUpdateRequest request = getTestRequest();
+        request.setRootEmail("InvalidEmail");
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/config")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(request))
+                        .header("Authorization", "Token"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Admin mail missing or is invalid")));
+
+    }
 
     private ConfigUpdateRequest getTestRequest(){
         ConfigUpdateRequest request = new ConfigUpdateRequest();
-        request.setToken("Valid token");
-        request.setToken("validToken");
         Map<String,String> newConfig = new HashMap<>();
         newConfig.put("mail_host","host");
         newConfig.put("mail_port", "587");
@@ -327,6 +341,7 @@ public class ConfigurationControllerTest {
         newConfig.put("mail_pass","mailPass");
         newConfig.put("api_key","apiKey");
         request.setNewConfig(newConfig);
+        request.setRootEmail("RootEmail@example.com");
         return request;
     }
 

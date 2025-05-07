@@ -42,8 +42,9 @@ function checkConfigStatus() {
             document.getElementById("mailHost").value = response.config.mail_host;
             document.getElementById("mailPort").value = response.config.mail_port;
             document.getElementById("mailName").value = response.config.mail_name;
+            document.getElementById("rootEmail").value = response.rootEmail;
         }, error: function (xhr) {
-            if (xhr.responseText.includes("Application settings not configured")) {
+            if (xhr.responseText.includes("First configuration not provided")) {
                 $("#configurationModal").modal('show');
                 checkPassword();
                 $("#rootPassword").submit(function (e) {
@@ -135,7 +136,7 @@ function validateRootPassword(password) {
 
 // Unlocking root main settings
 function unlockSettings() {
-    $("#mailHost, #mailPort, #mailName, #mailPassword, #apiKey").prop("disabled", false);
+    $("#mailHost, #mailPort, #mailName, #mailPassword, #apiKey, #rootEmail").prop("disabled", false);
 
     $("#unlockSettings").removeClass("btn-outline-warning").addClass("btn-outline-success")
         .text("🔓 Lock main settings")
@@ -148,24 +149,25 @@ function lockSettings() {
     console.log(rootAuthToken);
     $("#unlockSettings").prop("disabled", true)
     const configuration = {
+        rootEmail: $("#rootEmail").val(),
         newConfig: {
             "mail_host": $("#mailHost").val(),
             "mail_port": $("#mailPort").val(),
             "mail_name": $("#mailName").val(),
             "mail_pass": $("#mailPassword").val(),
             "api_key": $("#apiKey").val()
-        },
-        token: rootAuthToken
+        }
     };
 
     $.ajax({
         type: "POST",
         url: "http://localhost:8080/config",
         data: JSON.stringify(configuration),
+        headers: {Authorization: rootAuthToken},
         contentType: "application/json",
         success: function () {
             $("#unlockSettings").prop("disabled", false)
-            $("#mailHost,#mailPort, #mailName, #mailPassword,#apiKey").prop("disabled", true);
+            $("#mailHost,#mailPort, #mailName, #mailPassword,#apiKey,#rootEmail").prop("disabled", true);
             $("#unlockSettings").removeClass("btn-outline-success").addClass("btn-outline-warning")
                 .text("🔒 Unlock main settings");
 

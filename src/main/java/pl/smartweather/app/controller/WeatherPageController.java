@@ -18,10 +18,11 @@ public class WeatherPageController {
     private final ConfigService configService;
     private final WeatherService weatherService;
 
-    @GetMapping("/api")
+    @GetMapping("/weather")
     public ResponseEntity<Weather> welcomePage() {
         LocalDate today = LocalDate.now();
-        weatherService.saveWeatherRecord(configService.getLocation());
+        String userLocation = configService.getLocation();
+        weatherService.saveWeatherRecord(userLocation);
         Optional<Weather> weather = weatherService.findWeatherByLocationAndDate(
                 configService.getLocation(), today);
         return ResponseEntity.ok(weather.get());

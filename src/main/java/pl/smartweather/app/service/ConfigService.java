@@ -52,7 +52,7 @@ public class ConfigService {
         if (!appConfig.isInitialized() && appConfig.getRootPassword() == null) {
             throw new ConfigurationException("First configuration not provided");
         }
-        if (appConfig.getConfig() == null) {
+        if (appConfig.getConfig() == null || appConfig.getLocation() == null) {
             throw new ConfigurationException("Admin need to provide proper configuration");
         }
     }
@@ -70,7 +70,7 @@ public class ConfigService {
         return properties;
     }
 
-    public void setupAppConfiguration(Map<String, String> configValues) {
+    public void setupAppConfiguration(Map<String, String> configValues, String rootEmail) {
         Map<String, String> updateConfig = new HashMap<>();
         configValues.forEach((k, v) -> {
             if (k.equals("mail_pass") || k.equals("api_key")) {
@@ -79,6 +79,7 @@ public class ConfigService {
                 updateConfig.put(k, v);
             }
         });
+        appConfig.setRootEmail(rootEmail);
         appConfig.setConfig(updateConfig);
         appConfig.setInitialized(true);
         mongoTemplate.save(appConfig);
@@ -130,14 +131,13 @@ public class ConfigService {
         }
     }
 
-    public String getLocation() {
-        if (!appConfig.isInitialized() || appConfig.getLocation() == null) {
-            throw new ConfigurationException("Location not provided");
+    public String getRootEmail() {
+        if (appConfig.isInitialized() && appConfig.getRootEmail() != null) {
+            return appConfig.getRootEmail();
         } else {
-            return appConfig.getLocation();
+            throw new ConfigurationException("Root email not provided");
         }
     }
-
     public void setLocationConfiguration(String location) {
         ApiLocationResponse locationResponse = checkIfLocationExists(location);
         appConfig.setLocation(locationResponse.getLocation().getName());

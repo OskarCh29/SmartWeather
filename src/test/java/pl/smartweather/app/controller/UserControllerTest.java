@@ -104,7 +104,8 @@ public class UserControllerTest {
 
     @Test
     void saveUserShouldReturn400CausedByValidation() throws Exception {
-        User testUser = User.builder().emailAddress("invalid.com").build();
+        User testUser = new User();
+        testUser.setEmailAddress("invalid.com");
 
         mockMvc.perform(MockMvcRequestBuilders.post("/user")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -115,7 +116,8 @@ public class UserControllerTest {
 
     @Test
     void saveUserShouldReturn400CausedByValidationEmptyField() throws Exception {
-        User testUser = User.builder().emailAddress("").build();
+        User testUser = new User();
+        testUser.setEmailAddress("");
 
         mockMvc.perform(MockMvcRequestBuilders.post("/user")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -125,7 +127,7 @@ public class UserControllerTest {
     }
     @Test
     void saveUserShouldReturn400CausedByValidationEmailMissing() throws Exception {
-        User testUser = User.builder().build();;
+        User testUser = new User();
 
         mockMvc.perform(MockMvcRequestBuilders.post("/user")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -149,7 +151,8 @@ public class UserControllerTest {
 
     @Test
     void deleteUserShouldReturn400CausedByValidation() throws Exception {
-        User testUser = User.builder().emailAddress("invalid12.com").build();
+        User testUser = new User();
+        testUser.setEmailAddress("invalid.com");
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/user")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -172,7 +175,9 @@ public class UserControllerTest {
     }
 
     private User initTestUser() {
-        return User.builder().emailAddress("testMail@example.com").build();
+        User user = new User();
+        user.setEmailAddress("testMail@example.com");
+        return user;
     }
 
 }

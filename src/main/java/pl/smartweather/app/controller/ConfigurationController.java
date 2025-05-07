@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.smartweather.app.entity.AppConfig;
 import pl.smartweather.app.model.request.ConfigUpdateRequest;
 import pl.smartweather.app.model.request.LocationRequest;
@@ -54,11 +51,12 @@ public class ConfigurationController {
 
     @PostMapping("/config")
     public ResponseEntity<GenericServerResponse> updateConfiguration(
-            @RequestBody @Valid ConfigUpdateRequest configRequest) {
+            @RequestBody @Valid ConfigUpdateRequest configRequest,
+            @RequestHeader("Authorization") String token) {
         emailService.validateEmailConfiguration(configRequest.getNewConfig());
         configService.validateApiKey(configRequest.getNewConfig().get("api_key"));
-        tokenService.validateToken(configRequest.getToken());
-        configService.setupAppConfiguration(configRequest.getNewConfig());
+        tokenService.validateToken(token);
+        configService.setupAppConfiguration(configRequest.getNewConfig(), configRequest.getRootEmail());
         return ResponseEntity.status(HttpStatus.CREATED).body(new GenericServerResponse("Configuration provided"));
     }
 }

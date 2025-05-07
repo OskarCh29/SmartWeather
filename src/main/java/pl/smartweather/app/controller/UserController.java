@@ -29,7 +29,8 @@ public class UserController {
 
     @PostMapping("/user")
     public ResponseEntity<User> saveUser(@RequestBody(required = true) @Valid UserRequest userRequest) {
-        User user = User.builder().emailAddress(userRequest.getEmailAddress()).build();
+        User user = new User();
+        user.setEmailAddress(userRequest.getEmailAddress());
         userService.saveNewUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
@@ -37,7 +38,8 @@ public class UserController {
     @DeleteMapping("/user")
     public ResponseEntity<GenericServerResponse> deleteUser(
             @RequestBody(required = true) @Valid UserRequest userRequest) {
-        User user = User.builder().emailAddress(userRequest.getEmailAddress()).build();
+        User user = new User();
+        user.setEmailAddress(userRequest.getEmailAddress());
         userService.deleteUser(user);
         return ResponseEntity.ok(new GenericServerResponse("User: " + user.getEmailAddress() + " has been deleted"));
     }

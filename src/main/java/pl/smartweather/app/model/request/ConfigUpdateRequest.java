@@ -1,10 +1,10 @@
 package pl.smartweather.app.model.request;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pl.smartweather.app.security.EmailGuard;
 import pl.smartweather.app.security.ProperConfig;
 
 import java.util.Map;
@@ -15,8 +15,8 @@ import java.util.Map;
 @AllArgsConstructor
 public class ConfigUpdateRequest {
 
-    @NotBlank(message = "Authorization token missing")
-    private String token;
+    @EmailGuard(message = "Admin mail missing or is invalid")
+    private String rootEmail;
 
     @ProperConfig
     private Map<String, String> newConfig;

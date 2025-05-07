@@ -9,10 +9,6 @@ weather:
   url: http://api.weatherapi.com/v1
 security:
   salt: "GH$LS1$#ghGEOUIY#12sdgsdhSD46hgO"
-userData:
-  location: Bialystok
-  userEmail: oskar.charytoniuk@tlen.pl
-  secondUserEmail: subMail@gmail.com
 server:
   port: 8080
   address: 0.0.0.0

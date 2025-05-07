@@ -15,6 +15,8 @@ public class AppConfig {
     @Id
     private String id = "app_config";
 
+    private String rootEmail;
+
     private String rootPassword;
 
     private boolean initialized;

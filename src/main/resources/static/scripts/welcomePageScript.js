@@ -1,7 +1,7 @@
 $(document).ready(function () {
     $.ajax({
         type: "GET",
-        url: "http://localhost:8080/api",
+        url: "http://localhost:8080/weather",
         dataType: "json",
         success: function (response) {
             console.log(response)
@@ -22,8 +22,8 @@ $(document).ready(function () {
 
             loadWeatherCharts(response);
             updateWeatherIcon(response);
-        },error: function(error){
-            console.error('Error while loading weather data:' , error);
+        },error: function(xhr){
+            console.error('Error while loading weather data:' , xhr.responseText);
             document.getElementById('location').textContent = "Application not configured - check config"
             $("#location").removeClass("text-info").addClass("text-danger");
         }

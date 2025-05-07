@@ -12,11 +12,12 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-@SpringBootTest(classes = ChartService.class)
+
+@SpringBootTest
 public class ChartServiceTest {
 
     @Autowired
-    ChartService chartService;
+    private ChartService chartService;
 
     @Test
     void shouldGenerateTemperatureChartImage() throws IOException {

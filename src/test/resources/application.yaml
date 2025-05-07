@@ -1,22 +1,12 @@
 spring:
+  data:
+    mongodb:
+      auto-index-creation: true
   main:
     banner-mode: false
-  mail:
-    host: ${MAIL_HOST:smtp.gmail.com}
-    port: ${MAIL_PORT:587}
-    username: oskartestowy1@gmail.com
-    password: rluo dfld zuev lpij
-    protocol: smtp
-    properties:
-      mail.smtp.auth: true
-      mail.smtp.starttls.enable: true
 weather:
   url: http://api.weatherapi.com/v1
 security:
-  API_KEY: "testApiKey"
   salt: "GH$LS1$#ghGEOUIY#12sdgsdhSD46hgO"
-userData:
-  location: TestLocation
-  userEmail: test@example.com
-  secondUserEmail: testUser@example.com
+
 

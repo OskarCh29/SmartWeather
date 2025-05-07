@@ -49,7 +49,7 @@ public class WeatherPageControllerTest {
         when(weatherService.findWeatherByLocationAndDate(weather.getLocation(), today))
                 .thenReturn(Optional.of(weather));
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api")
+        mockMvc.perform(MockMvcRequestBuilders.get("/weather")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.location").value("TestLocation"));
@@ -62,7 +62,7 @@ public class WeatherPageControllerTest {
         doThrow(new ExternalException("API service - unavailable")).when(weatherService).saveWeatherRecord(any());
 
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api")
+        mockMvc.perform(MockMvcRequestBuilders.get("/weather")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(containsString("API service - unavailable")));
@@ -74,7 +74,7 @@ public class WeatherPageControllerTest {
         when(configService.getLocation()).thenReturn("TestLocation");
         doThrow(new SecurityException("Invalid API key provided")).when(weatherService).saveWeatherRecord(any());
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api")
+        mockMvc.perform(MockMvcRequestBuilders.get("/weather")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string(containsString("Invalid API key provided")));
@@ -85,7 +85,7 @@ public class WeatherPageControllerTest {
         when(configService.getLocation()).thenReturn("TestLocation");
         doThrow(new NoMatchFoundException("Provided location not found")).when(weatherService).saveWeatherRecord(any());
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api")
+        mockMvc.perform(MockMvcRequestBuilders.get("/weather")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(containsString("Provided location not found")));
