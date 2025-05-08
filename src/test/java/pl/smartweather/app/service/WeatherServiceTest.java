@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cglib.core.Local;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -20,7 +19,8 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -62,13 +62,15 @@ public class WeatherServiceTest {
                 .date(LocalDate.now())
                 .build();
 
-        when(weatherClient.getCurrentWeather(anyString())).thenReturn(Mono.just(weather));
+        when(weatherClient.getCurrentWeather(anyString(),anyString())).thenReturn(Mono.just(weather));
 
-        weatherService.saveWeatherRecord("TestLocation");
+        weatherService.saveWeatherRecord("TestLocation","Valid Api-Key");
+        verify(weatherClient).getCurrentWeather(anyString(),anyString());
 
     }
+
     @Test
-    void saveWeatherRecordWhenExistUpdate(){
+    void saveWeatherRecordWhenExistUpdate() {
         WeatherInformation currentWeather = new WeatherInformation();
         currentWeather.setTemperature(20);
         Weather current = Weather.builder()
@@ -79,17 +81,17 @@ public class WeatherServiceTest {
 
         initTestWeather();
 
-        when(weatherClient.getCurrentWeather("TestLocation")).thenReturn(Mono.just(current));
-        weatherService.saveWeatherRecord("TestLocation");
+        when(weatherClient.getCurrentWeather(anyString(),anyString())).thenReturn(Mono.just(current));
+        weatherService.saveWeatherRecord("TestLocation","Valid-ApiKey");
 
         Optional<Weather> updatedRecord = weatherRepository
                 .findByLocationAndDate(current.getLocation(), LocalDate.now());
         assertTrue(updatedRecord.isPresent());
-        assertEquals(20,updatedRecord.get().getWeatherInformation().getTemperature());
+        assertEquals(20, updatedRecord.get().getWeatherInformation().getTemperature());
     }
 
     @Test
-    void saveWeatherRecordDoNothingWhenNoUpdateNeeded(){
+    void saveWeatherRecordDoNothingWhenNoUpdateNeeded() {
         WeatherInformation currentWeather = new WeatherInformation();
         currentWeather.setTemperature(15);
         Weather current = Weather.builder()
@@ -100,8 +102,8 @@ public class WeatherServiceTest {
 
         initTestWeather();
 
-        when(weatherClient.getCurrentWeather("TestLocation")).thenReturn(Mono.just(current));
-        weatherService.saveWeatherRecord("TestLocation");
+        when(weatherClient.getCurrentWeather(anyString(),anyString())).thenReturn(Mono.just(current));
+        weatherService.saveWeatherRecord("TestLocation","Valid Api-Key");
 
         Optional<Weather> updatedRecord = weatherRepository
                 .findByLocationAndDate(current.getLocation(), LocalDate.now());
@@ -114,7 +116,7 @@ public class WeatherServiceTest {
         String location = "TestLocation";
         LocalDate date = LocalDate.now();
 
-        Optional<Weather> foundWeather = weatherService.findWeatherByLocationAndDate(location,date);
+        Optional<Weather> foundWeather = weatherService.findWeatherByLocationAndDate(location, date);
 
         assertTrue(foundWeather.isPresent());
         assertEquals(location, foundWeather.get().getLocation(), "Locations should be equal");

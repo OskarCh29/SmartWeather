@@ -6,11 +6,12 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import pl.smartweather.app.entity.Weather;
+import pl.smartweather.app.exception.ApiAuthorizationException;
 import pl.smartweather.app.exception.ExternalException;
 import pl.smartweather.app.exception.NoMatchFoundException;
 import pl.smartweather.app.mapper.WeatherResponseToWeatherMapper;
+import pl.smartweather.app.model.response.ApiLocationResponse;
 import pl.smartweather.app.model.response.WeatherApiResponse;
-import pl.smartweather.app.service.ConfigService;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -18,14 +19,13 @@ import reactor.core.publisher.Mono;
 public class WeatherClient {
 
     private final WebClient webClient;
-    private final ConfigService configService;
     private final WeatherResponseToWeatherMapper mapper;
 
-    public Mono<Weather> getCurrentWeather(String location) {
+    public Mono<Weather> getCurrentWeather(String location, String apiKey) {
         String queryLocation = location.trim();
         return webClient.get().uri(uriBuilder -> uriBuilder
                         .path("/forecast.json")
-                        .queryParam("key", configService.getApiKey())
+                        .queryParam("key", apiKey)
                         .queryParam("q", queryLocation)
                         .queryParam("days", 1)
                         .queryParam("aqi", false)
@@ -44,4 +44,26 @@ public class WeatherClient {
                 .bodyToMono(WeatherApiResponse.class)
                 .map(mapper::map);
     }
+
+    public Mono<ApiLocationResponse> validateInputFields(String location, String apiKey) {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/current.json")
+                        .queryParam("key", apiKey)
+                        .queryParam("q", location)
+                        .queryParam("aqi", false)
+                        .build())
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, response -> {
+                    if (response.statusCode() == HttpStatus.FORBIDDEN) {
+                        return Mono.error(new ApiAuthorizationException("API key is invalid - check configuration"));
+                    }
+                    if (response.statusCode() == HttpStatus.BAD_REQUEST) {
+                        return Mono.error(new NoMatchFoundException("Provided location not found"));
+                    }
+                    return Mono.error(new ExternalException("Unexpected error during weather API validation"));
+                })
+                .bodyToMono(ApiLocationResponse.class);
+    }
+
 }

@@ -44,8 +44,8 @@ public class WeatherPageControllerTest {
                 .weatherInformation(new WeatherInformation())
                 .build();
 
-        when(configService.getLocation()).thenReturn("TestLocation");
-        doNothing().when(weatherService).saveWeatherRecord(any());
+        when(configService.getUserLocation()).thenReturn("TestLocation");
+        doNothing().when(weatherService).saveWeatherRecord(any(),any());
         when(weatherService.findWeatherByLocationAndDate(weather.getLocation(), today))
                 .thenReturn(Optional.of(weather));
 
@@ -58,8 +58,8 @@ public class WeatherPageControllerTest {
     @Test
     void getWeatherShouldReturn400withResponseExternalApiUnavailable() throws Exception {
 
-        when(configService.getLocation()).thenReturn("TestLocation");
-        doThrow(new ExternalException("API service - unavailable")).when(weatherService).saveWeatherRecord(any());
+        when(configService.getUserLocation()).thenReturn("TestLocation");
+        doThrow(new ExternalException("API service - unavailable")).when(weatherService).saveWeatherRecord(any(),any());
 
 
         mockMvc.perform(MockMvcRequestBuilders.get("/weather")
@@ -71,8 +71,8 @@ public class WeatherPageControllerTest {
     @Test
     void getWeatherShouldReturn401withResponseApiKeyInvalid() throws Exception {
 
-        when(configService.getLocation()).thenReturn("TestLocation");
-        doThrow(new SecurityException("Invalid API key provided")).when(weatherService).saveWeatherRecord(any());
+        when(configService.getUserLocation()).thenReturn("TestLocation");
+        doThrow(new SecurityException("Invalid API key provided")).when(weatherService).saveWeatherRecord(any(),any());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/weather")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -82,8 +82,8 @@ public class WeatherPageControllerTest {
     @Test
     void getWeatherShouldReturn404withResponseNoMatchForLocation() throws Exception {
 
-        when(configService.getLocation()).thenReturn("TestLocation");
-        doThrow(new NoMatchFoundException("Provided location not found")).when(weatherService).saveWeatherRecord(any());
+        when(configService.getUserLocation()).thenReturn("TestLocation");
+        doThrow(new NoMatchFoundException("Provided location not found")).when(weatherService).saveWeatherRecord(any(),any());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/weather")
                         .contentType(MediaType.APPLICATION_JSON))

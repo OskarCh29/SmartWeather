@@ -35,7 +35,7 @@ public class DailyForecastScheduler {
             }
             String location = config.getLocation();
             LocalDate today = LocalDate.now();
-            weatherService.saveWeatherRecord(location);
+            weatherService.saveWeatherRecord(location, configService.getApiKey());
 
             List<User> userList = userService.getAllUsers();
             if (userList.isEmpty()) {
@@ -61,7 +61,7 @@ public class DailyForecastScheduler {
 
         } catch (Exception e) {
             log.error("Error occurred while distributing weather reports: {}", e.getMessage());
-            emailService.sendErrorNotification(configService.getRootEmail(), "Daily Forecast Scheduler Failure",
+            emailService.sendErrorNotification(config.getRootEmail(), "Daily Forecast Scheduler Failure",
                     "Your application encountered error while distributing daily reports. \n"
                             + "Check the following error trace: " + e);
         }

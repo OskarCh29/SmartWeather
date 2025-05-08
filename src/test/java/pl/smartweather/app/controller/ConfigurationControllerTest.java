@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import pl.smartweather.app.entity.AppConfig;
+import pl.smartweather.app.exception.ApiAuthorizationException;
 import pl.smartweather.app.exception.ConfigurationException;
 import pl.smartweather.app.model.request.ConfigUpdateRequest;
 import pl.smartweather.app.model.request.LocationRequest;
@@ -126,7 +127,7 @@ public class ConfigurationControllerTest {
     void updateRootPasswordShouldReturn200() throws Exception {
         RootPasswordRequest request = new RootPasswordRequest("Root123");
 
-        doNothing().when(configService).setRootPassword(request.getRootPassword());
+        doNothing().when(configService).initRootPassword(request.getRootPassword());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/config/root")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -134,14 +135,13 @@ public class ConfigurationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Root password updated"));
 
-        verify(configService).setRootPassword(any());
+        verify(configService).initRootPassword(any());
     }
 
     @ParameterizedTest
     @CsvFileSource(resources = "/testCase/passwordValidation_cases.csv")
     void updateRootPasswordShouldReturn400causedByValidation(String password) throws Exception {
         RootPasswordRequest request = new RootPasswordRequest(password);
-
 
         mockMvc.perform(MockMvcRequestBuilders.post("/config/root")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -152,7 +152,6 @@ public class ConfigurationControllerTest {
     @Test
     void updateRootPasswordShouldReturn400causedByValidation() throws Exception {
         RootPasswordRequest request = new RootPasswordRequest();
-
 
         mockMvc.perform(MockMvcRequestBuilders.post("/config/root")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -166,7 +165,7 @@ public class ConfigurationControllerTest {
         RootPasswordRequest request = new RootPasswordRequest("Root123");
 
         doThrow(new ConfigurationException("Root password was initialized"))
-                .when(configService).setRootPassword(request.getRootPassword());
+                .when(configService).initRootPassword(request.getRootPassword());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/config/root")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -174,7 +173,7 @@ public class ConfigurationControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(containsString("Root password was initialized")));
 
-        verify(configService).setRootPassword(any());
+        verify(configService).initRootPassword(any());
     }
 
     @Test
@@ -202,7 +201,21 @@ public class ConfigurationControllerTest {
                         .content(new ObjectMapper().writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(containsString("Location cannot contain numbers")));
+    }
+    @Test
+    void updateConfigLocationShouldReturn403causedByInvalidApiKey() throws Exception {
+        LocationRequest request = new LocationRequest("Warsaw");
 
+        doThrow(new ApiAuthorizationException("Invalid Api-Key"))
+                .when(configService).setLocationConfiguration(request.getLocation());
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/config/location")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(request)))
+                .andExpect(status().isForbidden())
+                .andExpect(content().string(containsString("Invalid Api-Key")));
+
+        verify(configService).setLocationConfiguration(any());
     }
 
     @Test

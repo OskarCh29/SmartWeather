@@ -93,7 +93,7 @@ public class EmailService {
         }
     }
 
-    private JavaMailSenderImpl buildMailConfiguration(Map<String, String> config) {
+    public JavaMailSenderImpl buildMailConfiguration(Map<String, String> config) {
         JavaMailSenderImpl sender = new JavaMailSenderImpl();
         sender.setHost(config.get("mail_host"));
         sender.setPort(Integer.parseInt(config.get("mail_port")));

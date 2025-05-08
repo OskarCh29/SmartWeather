@@ -39,7 +39,7 @@ public class ConfigurationController {
 
     @PostMapping("/config/root")
     public ResponseEntity<GenericServerResponse> setRootPassword(@RequestBody @Valid RootPasswordRequest rootPass) {
-        configService.setRootPassword(rootPass.getRootPassword());
+        configService.initRootPassword(rootPass.getRootPassword());
         return ResponseEntity.ok(new GenericServerResponse("Root password updated"));
     }
 

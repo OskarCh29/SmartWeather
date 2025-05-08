@@ -14,9 +14,11 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import pl.smartweather.app.configuration.WebConfiguration;
 import pl.smartweather.app.entity.Weather;
+import pl.smartweather.app.exception.ApiAuthorizationException;
 import pl.smartweather.app.exception.ExternalException;
 import pl.smartweather.app.exception.NoMatchFoundException;
 import pl.smartweather.app.mapper.WeatherResponseToWeatherMapper;
+import pl.smartweather.app.model.response.ApiLocationResponse;
 import pl.smartweather.app.service.ConfigService;
 import pl.smartweather.app.util.TestUtil;
 import reactor.test.StepVerifier;
@@ -61,13 +63,13 @@ public class WeatherClientTest {
     }
 
     @Test
-    void shouldReturnStatus200WithMappedWeatherObject() throws Exception {
+    void getCurrentWeatherShouldReturnStatus200WithMappedWeatherObject() throws Exception {
         String location = "London";
         String apiKey = "Api-Key";
 
         when(configService.getApiKey()).thenReturn(apiKey);
 
-        var mockResponse = TestUtil.getJsonResponseFromFile("/response/WeatherResponse_200.json");
+        var mockResponse = TestUtil.getJsonResponseFromFile("/response/ForecastResponse_200.json");
 
         WIRE_MOCK_SERVER.stubFor(get(urlPathEqualTo("/forecast.json"))
                 .withQueryParam("key", equalTo("Api-Key"))
@@ -78,7 +80,7 @@ public class WeatherClientTest {
                 .willReturn(ok().withBody(mockResponse)
                         .withHeader(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
 
-        Weather weatherResult = weatherClient.getCurrentWeather(location).block();
+        Weather weatherResult = weatherClient.getCurrentWeather(location, apiKey).block();
 
         assertNotNull(weatherResult);
         assertEquals(location, weatherResult.getLocation());
@@ -93,11 +95,11 @@ public class WeatherClientTest {
     }
 
     @Test
-    void shouldReturnStatus400whenApiEncounteredProblems() {
+    void getCurrentWeatherShouldReturnStatus400whenApiEncounteredProblems() {
         WIRE_MOCK_SERVER.stubFor(get(urlPathEqualTo("/forecast.json"))
                 .willReturn(serverError()));
 
-        StepVerifier.create(weatherClient.getCurrentWeather("Warsaw"))
+        StepVerifier.create(weatherClient.getCurrentWeather("Warsaw", "Api-Key"))
                 .expectErrorMatches(throwable ->
                         throwable instanceof ExternalException
                                 && throwable.getMessage().contains("API encountered error - check your request"))
@@ -105,11 +107,11 @@ public class WeatherClientTest {
     }
 
     @Test
-    void ShouldReturn403whenInvalidApiKeyProvided() {
+    void getCurrentWeatherShouldReturn403whenInvalidApiKeyProvided() {
         WIRE_MOCK_SERVER.stubFor(get(urlPathEqualTo("/forecast.json"))
                 .willReturn(forbidden()));
 
-        StepVerifier.create(weatherClient.getCurrentWeather("Warsaw"))
+        StepVerifier.create(weatherClient.getCurrentWeather("Warsaw", "Invalid-ApiKey"))
                 .expectErrorMatches(throwable ->
                         throwable instanceof SecurityException
                                 && throwable.getMessage().contains("Provided invalid API key"))
@@ -117,13 +119,73 @@ public class WeatherClientTest {
     }
 
     @Test
-    void shouldReturn404whenNoMatchForLocationFound() {
+    void getCurrentWeatherShouldReturn404whenNoMatchForLocationFound() {
         WIRE_MOCK_SERVER.stubFor(get(urlPathEqualTo("/forecast.json"))
                 .willReturn(notFound()));
 
-        StepVerifier.create(weatherClient.getCurrentWeather("abcd"))
+        StepVerifier.create(weatherClient.getCurrentWeather("abcd", "Valid-ApiKey"))
                 .expectErrorMatches(throwable -> throwable instanceof NoMatchFoundException
-                && throwable.getMessage().contains("No match found on location provided"))
+                        && throwable.getMessage().contains("No match found on location provided"))
+                .verify();
+    }
+
+    @Test
+    void validateInputFieldsShouldReturn200withResponse() throws Exception {
+        String location = "London";
+        String apiKey = "validApiKey";
+        var response = TestUtil.getJsonResponseFromFile("/response/WeatherResponse_200.json");
+
+        WIRE_MOCK_SERVER.stubFor(get(urlPathEqualTo("/current.json"))
+                        .withQueryParam("key",equalTo(apiKey))
+                        .withQueryParam("q",equalTo(location))
+                        .withQueryParam("aqi",equalTo("false"))
+                .willReturn(ok()
+                        .withBody(response)
+                        .withHeader(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+
+        ApiLocationResponse locationResponse = weatherClient.validateInputFields(location,apiKey).block();
+
+        assertNotNull(locationResponse);
+        assertEquals("London",locationResponse.getLocation().getName());
+    }
+
+    @Test
+    void validateInputFieldsShouldReturn403apiKeyInvalid(){
+        String location = "validLocation";
+        String apiKey = "InvalidApiKey";
+
+        WIRE_MOCK_SERVER.stubFor(get(urlPathEqualTo("/current.json"))
+                .willReturn(forbidden()));
+
+        StepVerifier.create(weatherClient.validateInputFields(location,apiKey))
+                .expectErrorMatches(throwable -> throwable instanceof ApiAuthorizationException
+                && throwable.getMessage().contains("API key is invalid - check configuration"))
+                .verify();
+    }
+
+    @Test
+    void validateInputFieldsShouldReturn404locationNotFound(){
+        String location = "InvalidLocation";
+        String apiKey = "validApiKey";
+        WIRE_MOCK_SERVER.stubFor(get(urlPathEqualTo("/current.json"))
+                .willReturn(badRequest()));
+
+        StepVerifier.create(weatherClient.validateInputFields(location,apiKey))
+                .expectErrorMatches(throwable -> throwable instanceof NoMatchFoundException
+                        && throwable.getMessage().contains("Provided location not found"))
+                .verify();
+    }
+
+    @Test
+    void validateInputFieldsShouldReturn401ApiAuthorization(){
+        String location = "validLocation";
+        String apiKey = "validApiKey";
+        WIRE_MOCK_SERVER.stubFor(get(urlPathEqualTo("/current.json"))
+                .willReturn(unauthorized()));
+
+        StepVerifier.create(weatherClient.validateInputFields(location,apiKey))
+                .expectErrorMatches(throwable -> throwable instanceof ExternalException
+                        && throwable.getMessage().contains("Unexpected error during weather API validation"))
                 .verify();
     }
 

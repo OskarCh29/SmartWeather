@@ -18,8 +18,8 @@ public class WeatherService {
     private final WeatherClient weatherClient;
     private final WeatherRepository weatherRepository;
 
-    public void saveWeatherRecord(String location) {
-        Weather weather = weatherClient.getCurrentWeather(location).block();
+    public void saveWeatherRecord(String location, String apiKey) {
+        Weather weather = weatherClient.getCurrentWeather(location, apiKey).block();
 
         Optional<Weather> existingRecord = findExistingRecord(weather);
         existingRecord.ifPresentOrElse(record -> updateWeatherIfChanged(record, weather), () ->

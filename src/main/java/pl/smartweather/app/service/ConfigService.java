@@ -6,18 +6,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
+import pl.smartweather.app.client.WeatherClient;
 import pl.smartweather.app.entity.AppConfig;
-import pl.smartweather.app.exception.ApiAuthorizationException;
 import pl.smartweather.app.exception.ConfigurationException;
-import pl.smartweather.app.exception.ExternalException;
-import pl.smartweather.app.exception.NoMatchFoundException;
 import pl.smartweather.app.model.response.ApiLocationResponse;
-import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +20,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class ConfigService {
-    private final WebClient webClient;
+    private final WeatherClient weatherClient;
     private final MongoTemplate mongoTemplate;
     private final CryptoService cryptoService;
     private final TokenService tokenService;
@@ -57,19 +51,6 @@ public class ConfigService {
         }
     }
 
-    public Map<String, String> getAppProperties() {
-        Map<String, String> properties = new HashMap<>();
-
-        appConfig.getConfig().forEach((k, v) -> {
-            if (k.equals("mail_pass") || k.equals("api_key")) {
-                properties.put(k, cryptoService.decrypt(v));
-            } else {
-                properties.put(k, v);
-            }
-        });
-        return properties;
-    }
-
     public void setupAppConfiguration(Map<String, String> configValues, String rootEmail) {
         Map<String, String> updateConfig = new HashMap<>();
         configValues.forEach((k, v) -> {
@@ -85,7 +66,7 @@ public class ConfigService {
         mongoTemplate.save(appConfig);
     }
 
-    public void setRootPassword(String rootPassword) {
+    public void initRootPassword(String rootPassword) {
         if (appConfig.getRootPassword() == null) {
             String hashedPassword = passwordEncoder.encode(salt + rootPassword);
             appConfig.setRootPassword(hashedPassword);
@@ -103,26 +84,6 @@ public class ConfigService {
         }
     }
 
-    public void validateApiKey(String apiKey) {
-        webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/current.json")
-                        .queryParam("key", apiKey)
-                        .queryParam("q", "Warsaw")
-                        .queryParam("aqi", false)
-                        .build())
-                .retrieve()
-                .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
-                        Mono.error(new ExternalException("API encountered error - check your request")))
-                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
-                    if (clientResponse.statusCode() == HttpStatus.FORBIDDEN) {
-                        return Mono.error(new ApiAuthorizationException("API key is invalid - check configuration"));
-                    }
-                    return Mono.error(new NoMatchFoundException("No match found on location provided"));
-                }).bodyToMono(String.class)
-                .block();
-    }
-
     public String getApiKey() {
         if (appConfig.isInitialized()) {
             return cryptoService.decrypt(appConfig.getConfig().get("api_key"));
@@ -131,13 +92,19 @@ public class ConfigService {
         }
     }
 
-    public String getRootEmail() {
-        if (appConfig.isInitialized() && appConfig.getRootEmail() != null) {
-            return appConfig.getRootEmail();
+    public String getUserLocation() {
+        if (appConfig.isInitialized() && appConfig.getLocation() != null) {
+            return appConfig.getLocation();
         } else {
-            throw new ConfigurationException("Root email not provided");
+            throw new ConfigurationException("Location not provided");
         }
     }
+
+    public void validateApiKey(String apiKey) {
+        String validLocation = "London";
+        weatherClient.validateInputFields(validLocation, apiKey);
+    }
+
     public void setLocationConfiguration(String location) {
         ApiLocationResponse locationResponse = checkIfLocationExists(location);
         appConfig.setLocation(locationResponse.getLocation().getName());
@@ -145,21 +112,8 @@ public class ConfigService {
     }
 
     private ApiLocationResponse checkIfLocationExists(String location) {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/current.json")
-                        .queryParam("key", getApiKey())
-                        .queryParam("q", location)
-                        .queryParam("aqi", false)
-                        .build())
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
-                    if (clientResponse.statusCode() == HttpStatus.BAD_REQUEST) {
-                        return Mono.error(new NoMatchFoundException("Provided location not found"));
-                    }
-                    return Mono.error(new ConfigurationException("Missing information or authorized"));
-                }).bodyToMono(ApiLocationResponse.class)
-                .block();
+        String validApiKey = getApiKey();
+        return weatherClient.validateInputFields(location, validApiKey).block();
     }
 }
 

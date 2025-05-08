@@ -21,10 +21,10 @@ public class WeatherPageController {
     @GetMapping("/weather")
     public ResponseEntity<Weather> welcomePage() {
         LocalDate today = LocalDate.now();
-        String userLocation = configService.getLocation();
-        weatherService.saveWeatherRecord(userLocation);
+        String userLocation = configService.getUserLocation();
+        weatherService.saveWeatherRecord(userLocation, configService.getApiKey());
         Optional<Weather> weather = weatherService.findWeatherByLocationAndDate(
-                configService.getLocation(), today);
+                configService.getUserLocation(), today);
         return ResponseEntity.ok(weather.get());
     }
 }
