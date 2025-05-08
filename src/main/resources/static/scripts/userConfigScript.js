@@ -21,7 +21,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: "POST",
-            url: "http://localhost:8080/user",
+            url: window.API_BASE_URL + "/user",
             data: JSON.stringify(newUser),
             contentType: "application/json",
             success: function () {
@@ -49,7 +49,7 @@ $(document).ready(function () {
 function LoadUserTable() {
     $.ajax({
         type: "GET",
-        url: "http://localhost:8080/user",
+        url: window.API_BASE_URL + "/user",
         dataType: "json",
         success: function (response) {
             let tableContent = '';
@@ -80,7 +80,7 @@ function LoadUserTable() {
 function deleteUser(email) {
     $.ajax({
         type: "DELETE",
-        url: "http://localhost:8080/user",
+        url: window.API_BASE_URL + "/user",
         data: JSON.stringify({ emailAddress: email }),
         contentType: "application/json",
         success: function () {

@@ -34,7 +34,7 @@ $(document).ready(function () {
 function checkConfigStatus() {
     $.ajax({
         type: "GET",
-        url: "http://localhost:8080/config",
+        url: window.API_BASE_URL + "/config",
         dataType: "json",
         success: function (response) {
             console.log(response);
@@ -63,7 +63,7 @@ function updateRootPassword() {
     }
     $.ajax({
         type: "POST",
-        url: "http://localhost:8080/config/root",
+        url: window.API_BASE_URL + "/root",
         data: JSON.stringify(rootPassword),
         contentType: "application/json",
         success: function () {
@@ -116,7 +116,7 @@ function validateRootPassword(password) {
     }
     $.ajax({
         type: "POST",
-        url: "http://localhost:8080/config/validate",
+        url: window.API_BASE_URL + "/validate",
         data: JSON.stringify(rootPass),
         contentType: "application/json",
         success: function (response) {
@@ -161,7 +161,7 @@ function lockSettings() {
 
     $.ajax({
         type: "POST",
-        url: "http://localhost:8080/config",
+        url: window.API_BASE_URL + "/config",
         data: JSON.stringify(configuration),
         headers: {Authorization: rootAuthToken},
         contentType: "application/json",
@@ -213,7 +213,7 @@ function lockLocation() {
     }
     $.ajax({
         type: "POST",
-        url: "http://localhost:8080/config/location",
+        url: window.API_BASE_URL + "/config/location",
         data: JSON.stringify(locationRequest),
         contentType: "application/json",
         success: function () {

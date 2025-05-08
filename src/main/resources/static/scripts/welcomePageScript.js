@@ -1,7 +1,7 @@
 $(document).ready(function () {
     $.ajax({
         type: "GET",
-        url: "http://localhost:8080/weather",
+        url: window.API_BASE_URL + "/weather",
         dataType: "json",
         success: function (response) {
             console.log(response)
