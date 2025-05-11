@@ -59,4 +59,8 @@ public class WeatherInformation {
                 && Objects.equals(hour, that.hour);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(hour, temperature, feelsLike, windSpeed, cloud, pressure, humidity, chanceOfRain);
+    }
 }

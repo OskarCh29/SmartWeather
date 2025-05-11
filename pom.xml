@@ -67,8 +67,8 @@
         </dependency>
         <dependency>
             <groupId>org.wiremock</groupId>
-            <artifactId>wiremock-jetty12</artifactId>
-            <version>3.12.0</version>
+            <artifactId>wiremock-standalone</artifactId>
+            <version>3.9.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -159,6 +159,11 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.2</version>
+            </plugin>
+            <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.12</version>
@@ -166,10 +171,11 @@
                     <execution>
                         <id>jacoco-prepare</id>
                         <goals>
-                            <goal>prepare-agent</goal>
+                            <goal>
+                                prepare-agent
+                            </goal>
                         </goals>
                     </execution>
-
                     <execution>
                         <id>jacoco-report</id>
                         <phase>verify</phase>
@@ -178,14 +184,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0</version>
-                <configuration>
-                    <argLine>${argLine}</argLine>
-                </configuration>
             </plugin>
         </plugins>
     </build>

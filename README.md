@@ -100,8 +100,8 @@ If all is setted up properly app will run automaticlly and will be sending repor
     After finding annotation @Scheduled just edit the cron in the brackets. Provide proper  cron expression<br>
     
 Example of the report:<br>
-<img src="images/report-example.jpg" width="400" alt="Report example">
-<img src="images/chart-example.jpg" width="400" alt="Chart example">
+![Image](https://github.com/user-attachments/assets/b90884eb-1d39-4e1a-b39f-2a2913062497)
+![Image](https://github.com/user-attachments/assets/169c1188-6af4-4200-b536-3a73d294ed2e)
 ## Technologies
 
 <b>Java:</b> The primary programming language for building backend logic
