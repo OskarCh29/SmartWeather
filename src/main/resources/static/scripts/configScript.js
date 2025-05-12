@@ -63,7 +63,7 @@ function updateRootPassword() {
     }
     $.ajax({
         type: "POST",
-        url: window.API_BASE_URL + "/root",
+        url: window.API_BASE_URL + "/config/root",
         data: JSON.stringify(rootPassword),
         contentType: "application/json",
         success: function () {
@@ -116,7 +116,7 @@ function validateRootPassword(password) {
     }
     $.ajax({
         type: "POST",
-        url: window.API_BASE_URL + "/validate",
+        url: window.API_BASE_URL + "/config/validate",
         data: JSON.stringify(rootPass),
         contentType: "application/json",
         success: function (response) {
