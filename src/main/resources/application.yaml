@@ -4,23 +4,17 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/weatherDB
-  mail:
-    host: ${MAIL_HOST:smtp.gmail.com}
-    port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    protocol: smtp
-    properties:
-      mail.smtp.auth: true
-      mail.smtp.starttls.enable: true
+      auto-index-creation: true
 weather:
   url: http://api.weatherapi.com/v1
 security:
-  API_KEY: ${WEATHER_KEY}
-userData:
-  location: Bialystok
-  userEmail: ${ADMIN_EMAIL}
-  secondUserEmail: ${SUBSCRIBE_EMAIL}
+  salt: "GH$LS1$#ghGEOUIY#12sdgsdhSD46hgO"
+server:
+  port: 8080
+  address: 0.0.0.0
+springdoc:
+  swagger-ui:
+    path: /api-doc
 
 
 

@@ -1,159 +1,136 @@
 package pl.smartweather.app.service;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
-import nl.altindag.log.LogCaptor;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import pl.smartweather.app.exception.BadParametersRequestException;
-import pl.smartweather.app.exception.NoMatchFoundException;
-import pl.smartweather.app.model.entity.ForecastInformation;
-import pl.smartweather.app.model.entity.Weather;
-import pl.smartweather.app.model.entity.WeatherInformation;
+import pl.smartweather.app.client.WeatherClient;
+import pl.smartweather.app.entity.Weather;
+import pl.smartweather.app.entity.WeatherInformation;
 import pl.smartweather.app.repository.WeatherRepository;
-import pl.smartweather.app.utils.TestUtils;
+import reactor.core.publisher.Mono;
 
-import java.io.IOException;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.Optional;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class WeatherServiceTest {
+
     @Container
     static final MongoDBContainer MONGO_DB_CONTAINER = new MongoDBContainer("mongo:4.4.18")
             .withExposedPorts(27017);
-    private static final WireMockServer WIRE_MOCK_SERVER = new WireMockServer(wireMockConfig().dynamicPort());
 
     @DynamicPropertySource
-    static void containerProperties(DynamicPropertyRegistry registry) {
+    static void setMongoDbContainer(DynamicPropertyRegistry registry) {
         MONGO_DB_CONTAINER.start();
         registry.add("spring.data.mongodb.host", MONGO_DB_CONTAINER::getHost);
         registry.add("spring.data.mongodb.port", MONGO_DB_CONTAINER::getFirstMappedPort);
-        registry.add("weather.url", WIRE_MOCK_SERVER::baseUrl);
     }
-
-    @Autowired
-    private WebTestClient webTestClient;
-
-    @Autowired
-    private WeatherRepository weatherRepository;
 
     @Autowired
     private WeatherService weatherService;
 
-    @BeforeAll
-    public static void setUpWireMockServer() {
-        WIRE_MOCK_SERVER.start();
-        configureFor("localhost", WIRE_MOCK_SERVER.port());
-    }
+    @Autowired
+    private WeatherRepository weatherRepository;
+
+    @MockitoBean
+    private WeatherClient weatherClient;
 
     @BeforeEach
-    public void testSetup() {
-        WIRE_MOCK_SERVER.resetAll();
+    void clearRecords() {
         weatherRepository.deleteAll();
     }
 
     @Test
-    void saveWeatherRecordWhenApiReturnsValidResponse() throws IOException {
-        String location = "London";
-        var response = TestUtils.getJsonFromFile("/responses/WeatherResponse_200.json");
-        WIRE_MOCK_SERVER.stubFor(get(urlPathEqualTo("/forecast.json"))
-                .withQueryParam("key", equalTo("testApiKey"))
-                .withQueryParam("q", equalTo(location))
-                .withQueryParam("days", equalTo("1"))
-                .willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(response)));
+    void saveWeatherRecordWhenRecordDoesNotExist() {
+        Weather weather = Weather.builder()
+                .location("TestLocation")
+                .date(LocalDate.now())
+                .build();
 
-        weatherService.saveWeatherRecord(location);
+        when(weatherClient.getCurrentWeather(anyString(),anyString(),anyInt())).thenReturn(Mono.just(weather));
 
-        List<Weather> savedRecord = weatherRepository.findAll();
-        assertEquals(1, savedRecord.size());
-        assertEquals(location, savedRecord.getFirst().getLocation());
-    }
-
-    @Test
-    void saveWeatherRecordWhenApiReturnValidResponseRecordExists() throws IOException {
-        String location = "London";
-        String date = "2025-04-08";
-        var response = TestUtils.getJsonFromFile("/responses/WeatherResponse_200.json");
-        WIRE_MOCK_SERVER.stubFor(get(urlPathEqualTo("/forecast.json"))
-                .withQueryParam("key", equalTo("testApiKey"))
-                .withQueryParam("q", equalTo(location))
-                .withQueryParam("days", equalTo("1"))
-                .willReturn(aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(response)));
-
-        createTestWeather();
-
-        LogCaptor logCaptor = LogCaptor.forClass(WeatherService.class);
-        weatherService.saveWeatherRecord(location);
-
-        List<String> infoLogs = logCaptor.getInfoLogs();
-        assertTrue(infoLogs.stream().anyMatch(log ->
-                log.contains("Record already exists for London on 2025-04-08")));
+        weatherService.saveWeatherRecord("TestLocation","Valid Api-Key");
+        verify(weatherClient).getCurrentWeather(anyString(),anyString(),anyInt());
 
     }
 
     @Test
-    void saveWeatherRecordThrowsBadParametersRequestExceptionStatus() {
-        stubFor(get(urlPathEqualTo("/forecast.json"))
-                .willReturn(serverError()));
-        assertThrows(BadParametersRequestException.class, () -> weatherService.saveWeatherRecord("TestLocation"));
+    void saveWeatherRecordWhenExistUpdate() {
+        WeatherInformation currentWeather = new WeatherInformation();
+        currentWeather.setTemperature(20);
+        Weather current = Weather.builder()
+                .location("TestLocation")
+                .date(LocalDate.now())
+                .weatherInformation(currentWeather)
+                .build();
+
+        initTestWeather();
+
+        when(weatherClient.getCurrentWeather(anyString(),anyString(),anyInt())).thenReturn(Mono.just(current));
+        weatherService.saveWeatherRecord("TestLocation","Valid-ApiKey");
+
+        Optional<Weather> updatedRecord = weatherRepository
+                .findByLocationAndDate(current.getLocation(), LocalDate.now());
+        assertTrue(updatedRecord.isPresent());
+        assertEquals(20, updatedRecord.get().getWeatherInformation().getTemperature());
     }
 
     @Test
-    void saveWeatherRecordThrowNoMatchesFoundExceptionStatus404() {
-        stubFor(get(urlPathEqualTo("/forecast.json"))
-                .willReturn(notFound()));
-        assertThrows(NoMatchFoundException.class, () -> weatherService.saveWeatherRecord("TestLocation"));
-    }
+    void saveWeatherRecordDoNothingWhenNoUpdateNeeded() {
+        WeatherInformation currentWeather = new WeatherInformation();
+        currentWeather.setTemperature(15);
+        Weather current = Weather.builder()
+                .location("TestLocation")
+                .date(LocalDate.now())
+                .weatherInformation(currentWeather)
+                .build();
 
+        initTestWeather();
+
+        when(weatherClient.getCurrentWeather(anyString(),anyString(),anyInt())).thenReturn(Mono.just(current));
+        weatherService.saveWeatherRecord("TestLocation","Valid Api-Key");
+
+        Optional<Weather> updatedRecord = weatherRepository
+                .findByLocationAndDate(current.getLocation(), LocalDate.now());
+        assertTrue(updatedRecord.isPresent());
+    }
 
     @Test
-    void findRecordByLocationAndDateRecordExists() {
-        Weather weather = createTestWeather();
+    void findWeatherByLocationAndDateRecordFound() {
+        initTestWeather();
+        String location = "TestLocation";
+        LocalDate date = LocalDate.now();
 
-        Weather foundRecord = weatherService.findWeatherByLocationAndDate(weather.getLocation(), weather.getDate());
+        Optional<Weather> foundWeather = weatherService.findWeatherByLocationAndDate(location, date);
 
-        assertNotNull(foundRecord, "Record should be found and not be null");
-        assertEquals(weather.getLocation(), foundRecord.getLocation(), "Location should be the same");
-        assertEquals(weather.getDate(), foundRecord.getDate(), "Records have the same date");
-        assertEquals(weather.getForecastInformation().size(), foundRecord.getForecastInformation().size(),
-                "Should have the same weather forecast");
+        assertTrue(foundWeather.isPresent());
+        assertEquals(location, foundWeather.get().getLocation(), "Locations should be equal");
+        assertEquals(date, foundWeather.get().getDate());
     }
 
-    @Test
-    void findRecordByLocationAndDateShouldReturnNull() {
-        String location = "TestLocation-NotExists";
-        String date = "1999-99-99";
-        assertNull(weatherService.findWeatherByLocationAndDate(location, date), "Should not find any record");
-    }
-
-
-    private Weather createTestWeather() {
-        WeatherInformation information = new WeatherInformation(
-                "00:00", 10, 10, 10, 10, 1000, 10, 0);
-        ForecastInformation forecastInformation = new ForecastInformation(
-                "05:00", "19:00", 10, List.of(information));
-        Weather testWeather = Weather.builder()
-                .location("London")
-                .date("2025-04-08")
-                .weatherInformation(information)
-                .forecastInformation(List.of(forecastInformation)).build();
-        weatherRepository.save(testWeather);
-        return testWeather;
+    private void initTestWeather() {
+        WeatherInformation lastUpdate = new WeatherInformation();
+        lastUpdate.setTemperature(15);
+        Weather lastWeather = Weather.builder()
+                .location("TestLocation")
+                .date(LocalDate.now())
+                .weatherInformation(lastUpdate)
+                .build();
+        weatherRepository.save(lastWeather);
     }
 
 }

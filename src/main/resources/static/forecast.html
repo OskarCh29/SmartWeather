@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forecast</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <link rel="stylesheet" href="style/GlobalStyle.css">
+    <script src="scripts/jquery-3.7.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <!-- Navbar future-->
+    <ul class="nav nav-pills flex-row mb-3" id="pills-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home"
+                aria-selected="true" id="homeButton">Home</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-target="#pills-forecast" type="button" role="tab"
+                aria-controls="pills-forecast" aria-selected="false" id="forecastButton">Forecast</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#pills-config" type="button" role="tab"
+                aria-controls="pills-config" aria-selected="false" id="configButton">Config</button>
+        </li>
+    </ul>
+    <div class="tab-content" id="pills-tabContent">
+        <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab"></div>
+        <div class="tab-pane fade" id="pills-forecast" role="tabpanel" aria-labelledby="pills-forecast-tab"></div>
+        <div class="tab-pane fade" id="pills-config" role="tabpanel" aria-labelledby="pills-config-tab"></div>
+    </div>
+    <!-- Main header-->
+    <div class="text-center mb-4">
+        <h1 class="main-heading text-info">
+            Smart-Weather Service <br>
+            Forecast
+        </h1>
+        <hr>
+    </div>
+    <div class="container-fluid mt-4">
+        <!--Forecast loading errror-->
+        <div class="text-center mb-4">
+            <span class="display-5 text-danger" id="forecastError"></span>
+        </div>
+        <!-- Today Forecast-->
+        <div class="text-center mb-4">
+            <span class="display-6 text-teal" id="today">Today</span>
+        </div>
+        <div class="row">
+
+            <div class="col-12 col-md-4 text-center mb-4">
+                <canvas id="temperatureChartDay1" width="400" height="200"></canvas>
+            </div>
+
+            <div class="col-12 col-md-4 text-center mb-4">
+                <canvas id="rainCloudChartDay1" width="400" height="200"></canvas>
+            </div>
+
+            <div class="col-12 col-md-4 text-center mb-4">
+                <canvas id="windChartDay1" width="400" height="200"></canvas>
+            </div>
+        </div>
+        <!-- Tomorrow Forecast-->
+        <div class="text-center mb-4">
+            <span class="display-6 text-teal" id="tomorrow">Tomorrow</span>
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-4 text-center mb-4">
+                <canvas id="temperatureChartDay2" width="400" height="200"></canvas>
+            </div>
+
+            <div class="col-12 col-md-4 text-center mb-4">
+                <canvas id="rainCloudChartDay2" width="400" height="200"></canvas>
+            </div>
+
+            <div class="col-12 col-md-4 text-center mb-4">
+                <canvas id="windChartDay2" width="400" height="200"></canvas>
+
+            </div>
+        </div>
+        <!-- The day after tomorrow chart-->
+        <div class="text-center mb-4">
+            <span class="display-6 text-teal" id="thirdDay">The day after tomorrow</span>
+        </div>
+        <div class="row">
+            
+            <div class="col-12 col-md-4 text-center mb-4">
+                <canvas id="temperatureChartDay3" width="400" height="200"></canvas>
+            </div>
+
+            <div class="col-12 col-md-4 text-center mb-4">
+                <canvas id="rainCloudChartDay3" width="400" height="200"></canvas>
+
+            </div>
+            <div class="col-12 col-md-4 text-center mb-4">
+                <canvas id="windChartDay3" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="scripts/navBarScript.js"></script>
+    <script src="scripts/forecastScript.js"></script>
+</body>
+
+</html>

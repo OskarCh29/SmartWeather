@@ -1,0 +1,24 @@
+{
+  "location": {
+    "name": "London",
+    "region": "City of London, Greater London",
+    "country": "United Kingdom",
+    "lat": 51.5171,
+    "lon": -0.1062,
+    "tz_id": "Europe/London",
+    "localtime_epoch": 1746631628,
+    "localtime": "2025-05-07 16:27"
+  },
+  "current": {
+    "last_updated": "2025-05-07 16:15",
+    "temp_c": 16.3,
+    "wind_kph": 17.6,
+    "wind_dir": "NNE",
+    "pressure_mb": 1022.0,
+    "humidity": 48,
+    "cloud": 75,
+    "feelslike_c": 16.3,
+    "vis_km": 10.0,
+    "gust_kph": 20.3
+  }
+}

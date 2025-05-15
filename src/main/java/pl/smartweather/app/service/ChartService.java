@@ -9,12 +9,13 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.springframework.stereotype.Service;
-import pl.smartweather.app.model.entity.WeatherInformation;
+import pl.smartweather.app.entity.WeatherInformation;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.LocalTime;
 import java.util.List;
 @Service
 public class ChartService {
@@ -25,7 +26,7 @@ public class ChartService {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
         for (WeatherInformation hour : hourForecast) {
-            String hourLabel = hour.getHour();
+            LocalTime hourLabel = hour.getHour();
             dataset.addValue(hour.getTemperature(), "Temperature", hourLabel);
             dataset.addValue(hour.getFeelsLike(), "Feels like", hourLabel);
         }
@@ -56,7 +57,7 @@ public class ChartService {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
         for (WeatherInformation hour : hourForecast) {
-            String hourLabel = hour.getHour();
+            LocalTime hourLabel = hour.getHour();
             dataset.addValue(hour.getChanceOfRain(), "Chance of rain [%]", hourLabel);
             dataset.addValue(hour.getCloud(), "Cloud [%]", hourLabel);
         }

@@ -11,12 +11,6 @@ public class WebConfiguration {
     @Value("${weather.url}")
     private String clientURL;
 
-    @Value("${mail.username")
-    private String emailUsername;
-
-    @Value("${mail.password")
-    private String emailPassword;
-
     @Bean
     public WebClient webClientSetup() {
         return WebClient.builder().baseUrl(clientURL).build();
