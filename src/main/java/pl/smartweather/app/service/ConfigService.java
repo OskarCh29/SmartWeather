@@ -115,5 +115,15 @@ public class ConfigService {
         String validApiKey = getApiKey();
         return weatherClient.validateInputFields(location, validApiKey).block();
     }
+
+    public Map<String, String> getEmailConfiguration() {
+        Map<String, String> config = appConfig.getConfig();
+
+        Map<String, String> emailConfig = new HashMap<>(config);
+        String mailPass = config.get("mail_pass");
+        emailConfig.put("mail_pass", cryptoService.decrypt(mailPass));
+
+        return emailConfig;
+    }
 }
 

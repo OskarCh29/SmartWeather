@@ -15,11 +15,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class WeatherService {
 
+    private static final int TODAY_FORECAST = 1;
     private final WeatherClient weatherClient;
     private final WeatherRepository weatherRepository;
 
     public void saveWeatherRecord(String location, String apiKey) {
-        Weather weather = weatherClient.getCurrentWeather(location, apiKey).block();
+        Weather weather = weatherClient.getCurrentWeather(location, apiKey, TODAY_FORECAST).block();
 
         Optional<Weather> existingRecord = findExistingRecord(weather);
         existingRecord.ifPresentOrElse(record -> updateWeatherIfChanged(record, weather), () ->

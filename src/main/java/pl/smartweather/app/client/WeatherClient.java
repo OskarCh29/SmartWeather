@@ -21,13 +21,13 @@ public class WeatherClient {
     private final WebClient webClient;
     private final WeatherResponseToWeatherMapper mapper;
 
-    public Mono<Weather> getCurrentWeather(String location, String apiKey) {
+    public Mono<Weather> getCurrentWeather(String location, String apiKey, int days) {
         String queryLocation = location.trim();
         return webClient.get().uri(uriBuilder -> uriBuilder
                         .path("/forecast.json")
                         .queryParam("key", apiKey)
                         .queryParam("q", queryLocation)
-                        .queryParam("days", 1)
+                        .queryParam("days", days)
                         .queryParam("aqi", false)
                         .queryParam("alerts", false)
                         .build())

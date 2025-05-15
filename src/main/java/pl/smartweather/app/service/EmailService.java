@@ -33,7 +33,7 @@ public class EmailService {
     public void initializeMailConfig() {
         AppConfig appConfig = configService.getAppConfig();
         if (appConfig.isInitialized()) {
-            this.mailSender = buildMailConfiguration(appConfig.getConfig());
+            this.mailSender = buildMailConfiguration(configService.getEmailConfiguration());
         } else {
             log.info("Mail sender not configured - Provide email configuration");
         }

@@ -72,6 +72,7 @@ public class EmailServiceTest {
         AppConfig config = createTestConfig();
 
         when(configService.getAppConfig()).thenReturn(config);
+        when(configService.getEmailConfiguration()).thenReturn(config.getConfig());
 
         emailService.initializeMailConfig();
 
@@ -133,6 +134,8 @@ public class EmailServiceTest {
         AppConfig invalidSender = createTestConfig();
 
         when(configService.getAppConfig()).thenReturn(invalidSender);
+        when(configService.getEmailConfiguration()).thenReturn(invalidSender.getConfig());
+
         emailService.initializeMailConfig();
         ReflectionTestUtils.setField(emailService, "mailSender", mailSender);
 

@@ -66,6 +66,7 @@ public class WeatherClientTest {
     void getCurrentWeatherShouldReturnStatus200WithMappedWeatherObject() throws Exception {
         String location = "London";
         String apiKey = "Api-Key";
+        int forecastDayNum = 1;
 
         when(configService.getApiKey()).thenReturn(apiKey);
 
@@ -80,7 +81,7 @@ public class WeatherClientTest {
                 .willReturn(ok().withBody(mockResponse)
                         .withHeader(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
 
-        Weather weatherResult = weatherClient.getCurrentWeather(location, apiKey).block();
+        Weather weatherResult = weatherClient.getCurrentWeather(location, apiKey,forecastDayNum).block();
 
         assertNotNull(weatherResult);
         assertEquals(location, weatherResult.getLocation());
@@ -99,7 +100,7 @@ public class WeatherClientTest {
         WIRE_MOCK_SERVER.stubFor(get(urlPathEqualTo("/forecast.json"))
                 .willReturn(serverError()));
 
-        StepVerifier.create(weatherClient.getCurrentWeather("Warsaw", "Api-Key"))
+        StepVerifier.create(weatherClient.getCurrentWeather("Warsaw", "Api-Key",1))
                 .expectErrorMatches(throwable ->
                         throwable instanceof ExternalException
                                 && throwable.getMessage().contains("API encountered error - check your request"))
@@ -111,7 +112,7 @@ public class WeatherClientTest {
         WIRE_MOCK_SERVER.stubFor(get(urlPathEqualTo("/forecast.json"))
                 .willReturn(forbidden()));
 
-        StepVerifier.create(weatherClient.getCurrentWeather("Warsaw", "Invalid-ApiKey"))
+        StepVerifier.create(weatherClient.getCurrentWeather("Warsaw", "Invalid-ApiKey",1))
                 .expectErrorMatches(throwable ->
                         throwable instanceof SecurityException
                                 && throwable.getMessage().contains("Provided invalid API key"))
@@ -123,7 +124,7 @@ public class WeatherClientTest {
         WIRE_MOCK_SERVER.stubFor(get(urlPathEqualTo("/forecast.json"))
                 .willReturn(notFound()));
 
-        StepVerifier.create(weatherClient.getCurrentWeather("abcd", "Valid-ApiKey"))
+        StepVerifier.create(weatherClient.getCurrentWeather("abcd", "Valid-ApiKey",1))
                 .expectErrorMatches(throwable -> throwable instanceof NoMatchFoundException
                         && throwable.getMessage().contains("No match found on location provided"))
                 .verify();

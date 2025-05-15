@@ -279,7 +279,6 @@ public class ConfigServiceTest {
         assertThrows(ConfigurationException.class, () -> configService.getUserLocation());
     }
 
-    ///  Here finished
     @Test
     void validateApiKeyBySendingRequestShouldReturnStatus200() {
         String apiKey = "valid-key";
@@ -307,8 +306,18 @@ public class ConfigServiceTest {
 
         configSpy.setLocationConfiguration(location);
 
+    }
 
+    @Test
+    void getEmailConfigurationShouldDecryptAndReturnConfig(){
+        AppConfig config = initTestConfig();
+        ReflectionTestUtils.setField(configService,"appConfig",config);
 
+        when(cryptoService.decrypt(anyString())).thenReturn("Encrypted");
+
+        Map<String,String> result = configService.getEmailConfiguration();
+
+        assertEquals("Encrypted",result.get("mail_pass"));
     }
 
     private AppConfig initTestConfig() {

@@ -21,8 +21,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -62,10 +61,10 @@ public class WeatherServiceTest {
                 .date(LocalDate.now())
                 .build();
 
-        when(weatherClient.getCurrentWeather(anyString(),anyString())).thenReturn(Mono.just(weather));
+        when(weatherClient.getCurrentWeather(anyString(),anyString(),anyInt())).thenReturn(Mono.just(weather));
 
         weatherService.saveWeatherRecord("TestLocation","Valid Api-Key");
-        verify(weatherClient).getCurrentWeather(anyString(),anyString());
+        verify(weatherClient).getCurrentWeather(anyString(),anyString(),anyInt());
 
     }
 
@@ -81,7 +80,7 @@ public class WeatherServiceTest {
 
         initTestWeather();
 
-        when(weatherClient.getCurrentWeather(anyString(),anyString())).thenReturn(Mono.just(current));
+        when(weatherClient.getCurrentWeather(anyString(),anyString(),anyInt())).thenReturn(Mono.just(current));
         weatherService.saveWeatherRecord("TestLocation","Valid-ApiKey");
 
         Optional<Weather> updatedRecord = weatherRepository
@@ -102,7 +101,7 @@ public class WeatherServiceTest {
 
         initTestWeather();
 
-        when(weatherClient.getCurrentWeather(anyString(),anyString())).thenReturn(Mono.just(current));
+        when(weatherClient.getCurrentWeather(anyString(),anyString(),anyInt())).thenReturn(Mono.just(current));
         weatherService.saveWeatherRecord("TestLocation","Valid Api-Key");
 
         Optional<Weather> updatedRecord = weatherRepository

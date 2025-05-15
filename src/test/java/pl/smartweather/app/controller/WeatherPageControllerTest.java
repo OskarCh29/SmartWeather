@@ -8,12 +8,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import pl.smartweather.app.client.WeatherClient;
 import pl.smartweather.app.entity.Weather;
 import pl.smartweather.app.entity.WeatherInformation;
 import pl.smartweather.app.exception.ExternalException;
 import pl.smartweather.app.exception.NoMatchFoundException;
 import pl.smartweather.app.service.ConfigService;
 import pl.smartweather.app.service.WeatherService;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -31,6 +33,9 @@ public class WeatherPageControllerTest {
 
     @MockitoBean
     private WeatherService weatherService;
+
+    @MockitoBean
+    private WeatherClient weatherClient;
 
     @Autowired
     private MockMvc mockMvc;
@@ -51,6 +56,26 @@ public class WeatherPageControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.get("/weather")
                         .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.location").value("TestLocation"));
+    }
+
+    @Test
+    void getForecastShouldReturn200withWeatherResponse()throws Exception{
+        LocalDate today = LocalDate.now();
+        String testLocation = "TestLocation";
+        String testApiKey = "Api-Key";
+        Weather weather = Weather.builder()
+                .location(testLocation)
+                .date(today)
+                .weatherInformation(new WeatherInformation())
+                .build();
+
+        when(configService.getUserLocation()).thenReturn(testLocation);
+        when(configService.getApiKey()).thenReturn(testApiKey);
+        when(weatherClient.getCurrentWeather(anyString(),anyString(),anyInt())).thenReturn(Mono.just(weather));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/weather/forecast"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.location").value("TestLocation"));
     }

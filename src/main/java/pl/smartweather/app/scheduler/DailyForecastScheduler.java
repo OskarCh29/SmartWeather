@@ -23,7 +23,7 @@ public class DailyForecastScheduler {
     private final ConfigService configService;
     private final UserService userService;
 
-    @Scheduled(cron = "0 0 8 * * *")
+    @Scheduled(cron = "0 54 9 * * *")
     public void sendInfoMail() {
         AppConfig config = configService.getAppConfig();
         try {
@@ -53,6 +53,7 @@ public class DailyForecastScheduler {
                             } catch (Exception e) {
                                 log.warn("Could not send weather report to {}: {}",
                                         user.getEmailAddress(), e.getMessage());
+                                e.printStackTrace();
                             }
                         });
                     }, (() -> {
