@@ -7,6 +7,7 @@ Weather&Forecast app for informing user about weather based on the location and 
 - [Requirements](#requirements)
 - [Installation and configuration](#installation-and-configuration)
 - [Raspberry Pi configuration](#raspberry-pi-configuration)
+- [Important Notes](#important-notes)
 - [Usage](#usage)
 - [Technologies](#technologies)
 - [Testing](#testing)

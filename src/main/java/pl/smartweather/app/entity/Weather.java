@@ -1,5 +1,6 @@
 package pl.smartweather.app.entity;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,10 +19,13 @@ import java.util.List;
 public class Weather {
 
     @Id
+    @Schema(example = "mongoID")
     private String id;
 
+    @Schema(example = "Warsaw")
     private String location;
 
+    @Schema(example = "2025-01-01")
     private LocalDate date;
 
     private WeatherInformation weatherInformation;
