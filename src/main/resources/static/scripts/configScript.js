@@ -67,7 +67,7 @@ function updateRootPassword() {
         data: JSON.stringify(rootPassword),
         contentType: "application/json",
         success: function () {
-            $("#root")[0].reset();
+            $("#rootPassword")[0].reset();
             $("#configurationModal").modal('hide');
         }, error: function () {
             console.log("Password was previously configured");

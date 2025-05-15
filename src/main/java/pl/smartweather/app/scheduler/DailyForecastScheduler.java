@@ -23,7 +23,7 @@ public class DailyForecastScheduler {
     private final ConfigService configService;
     private final UserService userService;
 
-    @Scheduled(cron = "0 54 9 * * *")
+    @Scheduled(cron = "0 0 8 * * *")
     public void sendInfoMail() {
         AppConfig config = configService.getAppConfig();
         try {
